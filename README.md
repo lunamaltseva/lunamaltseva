@@ -1,16 +1,13 @@
-### Hi there 👋
+<h1 align="center">Hi-ya, I'm Luna</h1>
+<h3 align="center">I am a freshman SFW student at AUCA with a background in gamedev and design</h3>
 
-<!--
-**lunamaltseva/lunamaltseva** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+- 🎨 [Some stuff](https://github.com/lunamaltseva/AUCA-stuff) I designed for AUCA
+- 📧 Feel free to contact me at md12366@auca.kg
 
-Here are some ideas to get you started:
+<br>
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+<h3 align="center">
+
+![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
+
+</h3>
