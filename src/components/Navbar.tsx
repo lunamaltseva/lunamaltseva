@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
     rightAligned: true,
     dropdown: [
       { label: 'Nuclear Decay Sim', href: '/decay' },
-      { label: 'Menstrual Clock', href: '/poetry' },
+      { label: 'Menstrual Clock', href: '/menstrualclock' },
     ],
   },
 ];

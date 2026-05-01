@@ -9,7 +9,7 @@ import About from './pages/About';
 import Design from './pages/Design';
 import Programming from './pages/Programming';
 import Redirect from './pages/r';
-import Poetry from './pages/Poetry';
+import MenstrualClock from './pages/MenstrualClock';
 import NotFound from './pages/NotFound';
 
 const Decay = lazy(() => import('./pages/Decay'));
@@ -17,7 +17,7 @@ const Decay = lazy(() => import('./pages/Decay'));
 function App() {
   return (
     <Routes>
-      <Route path="/poetry" element={<Poetry />} />
+      <Route path="/menstrualclock" element={<MenstrualClock />} />
       <Route path="*" element={
         <div className="app-wrapper">
           <Navbar />
