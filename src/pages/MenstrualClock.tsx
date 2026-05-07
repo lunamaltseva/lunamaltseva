@@ -119,7 +119,7 @@ const TEST_NOUNS = ['other', 'human', 'me', 'rise', 'shall', 'resoluteness', 'an
 
 const ALL_WORDS = [E_NOUNS, P_VERBS, FSH_ADJS, LH_NOUNS, TEST_NOUNS];
 
-const COLORS: Record<HKey, string> = { e: '#c46b8f', p: '#d4a843', lh: '#5b8fd4', fsh: '#c45b5b', test: '#6b6b6b' };
+const COLORS: Record<HKey, string> = { e: '#b85c7a', p: '#b8922e', lh: '#4a7ab8', fsh: '#a84848', test: '#7a6e62' };
 const COLOR_LABELS: [HKey, string][] = [['e', 'Estrogen'], ['p', 'Progesterone'], ['lh', 'LH'], ['fsh', 'FSH'], ['test', 'Testosterone']];
 
 function buildSentence(ei: number, pi: number, fi: number, li: number, ti: number) {
@@ -160,11 +160,11 @@ function renderLine(text: string, highlights: { phrase: string; color: string }[
 
 function PoemTooltip({ poem, isMobile }: { poem: PoemData; isMobile: boolean }) {
   return (
-    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '0.5rem', background: 'rgba(255,255,255,0.97)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '10px', padding: isMobile ? '0.7rem 0.9rem' : '0.85rem 1.1rem', boxShadow: '0 4px 24px rgba(180,140,140,0.1), 0 1px 4px rgba(0,0,0,0.03)', zIndex: 10, maxWidth: isMobile ? '85vw' : '480px', minWidth: '200px', fontFamily: "'Source Serif 4', Georgia, serif", lineHeight: 1.6, pointerEvents: 'none' }}>
-      {poem.contextAbove && <div style={{ fontSize: '0.9rem', color: '#7a6a6a', fontStyle: 'italic', marginBottom: '0.25rem', whiteSpace: 'pre-line' }}>{poem.contextAbove}</div>}
-      <div style={{ fontSize: '0.95rem', color: '#333', fontWeight: 500 }}>{poem.text}</div>
-      {poem.contextBelow && <div style={{ fontSize: '0.9rem', color: '#7a6a6a', fontStyle: 'italic', marginTop: '0.25rem', whiteSpace: 'pre-line' }}>{poem.contextBelow}</div>}
-      <div style={{ marginTop: '0.6rem', fontSize: '0.75rem', color: '#8a7a7a', borderTop: '1px solid rgba(0,0,0,0.04)', paddingTop: '0.4rem', letterSpacing: '0.02em' }}>
+    <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: '0.75rem', background: 'rgba(250,248,245,0.97)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(196,168,136,0.18)', borderRadius: '6px', padding: isMobile ? '0.9rem 1.1rem' : '1.1rem 1.4rem', boxShadow: '0 8px 40px rgba(28,23,20,0.08), 0 1px 4px rgba(28,23,20,0.04)', zIndex: 10, maxWidth: isMobile ? '85vw' : '480px', minWidth: '200px', fontFamily: "'Source Serif 4', Georgia, serif", lineHeight: 1.6, pointerEvents: 'none' }}>
+      {poem.contextAbove && <div style={{ fontSize: '0.9rem', color: '#8a7a6a', fontStyle: 'italic', marginBottom: '0.25rem', whiteSpace: 'pre-line' }}>{poem.contextAbove}</div>}
+      <div style={{ fontSize: '0.95rem', color: '#1c1714', fontWeight: 400 }}>{poem.text}</div>
+      {poem.contextBelow && <div style={{ fontSize: '0.9rem', color: '#8a7a6a', fontStyle: 'italic', marginTop: '0.25rem', whiteSpace: 'pre-line' }}>{poem.contextBelow}</div>}
+      <div style={{ marginTop: '0.6rem', fontSize: '0.75rem', color: '#a89888', borderTop: '1px solid rgba(196,168,136,0.15)', paddingTop: '0.4rem', letterSpacing: '0.02em' }}>
         {poem.author && <span>{poem.author}</span>}{poem.author && poem.source && <span> — </span>}{poem.source && <span style={{ fontStyle: 'italic' }}>{poem.source}</span>}
       </div>
     </div>
@@ -204,16 +204,16 @@ function IconBtn({ onClick, holdable, disabled, children, title }: { onClick: ()
   return (
     <button onClick={holdable ? undefined : onClick} onMouseDown={holdable ? startHold : undefined} onMouseUp={clear} onMouseLeave={clear}
       onTouchStart={holdable ? startHold : undefined} onTouchEnd={clear}
-      disabled={disabled} title={title} style={{ background: 'none', border: '1px solid rgba(180,140,140,0.2)', borderRadius: '50%', padding: '8px', cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.3 : 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 0, width: '34px', height: '34px', transition: 'opacity 0.3s' }}>{children}</button>
+      disabled={disabled} title={title} style={{ background: 'none', border: '1px solid rgba(196,168,136,0.25)', borderRadius: '50%', padding: '9px', cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.25 : 0.55, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 0, width: '36px', height: '36px', transition: 'opacity 0.3s' }}>{children}</button>
   );
 }
 
-const SlowerIcon = () => <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><polygon points="8,1 1,7 8,13" fill="#8a7a7a" /><polygon points="15,1 8,7 15,13" fill="#8a7a7a" /></svg>;
-const FasterIcon = () => <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><polygon points="1,1 8,7 1,13" fill="#8a7a7a" /><polygon points="8,1 15,7 8,13" fill="#8a7a7a" /></svg>;
-const PlayIcon = () => <svg width="11" height="12" viewBox="0 0 12 14" fill="none"><polygon points="2,1 11,7 2,13" fill="#8a7a7a" /></svg>;
-const PauseIcon = () => <svg width="11" height="12" viewBox="0 0 12 14" fill="none"><rect x="1" y="1" width="3.5" height="12" rx="0.5" fill="#8a7a7a" /><rect x="7.5" y="1" width="3.5" height="12" rx="0.5" fill="#8a7a7a" /></svg>;
-const StopIcon = () => <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1" fill="#8a7a7a" /></svg>;
-const ChevronDown = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8a7070" strokeWidth="1.5" strokeLinecap="round"><polyline points="7,10 12,15 17,10" /></svg>;
+const SlowerIcon = () => <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><polygon points="8,1 1,7 8,13" fill="#9a8878" /><polygon points="15,1 8,7 15,13" fill="#9a8878" /></svg>;
+const FasterIcon = () => <svg width="14" height="12" viewBox="0 0 16 14" fill="none"><polygon points="1,1 8,7 1,13" fill="#9a8878" /><polygon points="8,1 15,7 8,13" fill="#9a8878" /></svg>;
+const PlayIcon = () => <svg width="11" height="12" viewBox="0 0 12 14" fill="none"><polygon points="2,1 11,7 2,13" fill="#9a8878" /></svg>;
+const PauseIcon = () => <svg width="11" height="12" viewBox="0 0 12 14" fill="none"><rect x="1" y="1" width="3.5" height="12" rx="0.5" fill="#9a8878" /><rect x="7.5" y="1" width="3.5" height="12" rx="0.5" fill="#9a8878" /></svg>;
+const StopIcon = () => <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><rect x="1.5" y="1.5" width="9" height="9" rx="1" fill="#9a8878" /></svg>;
+const ChevronDown = () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a89888" strokeWidth="1.5" strokeLinecap="round"><polyline points="7,10 12,15 17,10" /></svg>;
 
 function CycleGraph({ offsetDay, width, height, cycleStartDate, cycleDuration, onDragStart, onDragMove, onDragEnd }: {
   offsetDay: number; width: number; height: number; cycleStartDate: Date; cycleDuration: number;
@@ -269,25 +269,25 @@ function CycleGraph({ offsetDay, width, height, cycleStartDate, cycleDuration, o
           </linearGradient>
         ))}
       </defs>
-      <rect x={PAD_L} y={PAD_TOP} width={innerW} height={innerH} fill="#fff" />
+      <rect x={PAD_L} y={PAD_TOP} width={innerW} height={innerH} fill="#faf8f5" />
       {ovulationXs.map((x, i) => (
         <g key={i} clipPath="url(#graph-clip)">
-          <line x1={x} y1={PAD_TOP} x2={x} y2={yBase} stroke="rgba(0,0,0,0.05)" strokeWidth={1} strokeDasharray="4,4" />
-          <text x={x + 4} y={PAD_TOP + 11} fontSize={7.5} fill="rgba(0,0,0,0.15)" fontStyle="italic" letterSpacing="0.04em">ovulation</text>
+          <line x1={x} y1={PAD_TOP} x2={x} y2={yBase} stroke="rgba(196,168,136,0.25)" strokeWidth={1} strokeDasharray="4,4" />
+          <text x={x + 4} y={PAD_TOP + 11} fontSize={7.5} fill="rgba(196,168,136,0.55)" fontStyle="italic" letterSpacing="0.04em">ovulation</text>
         </g>
       ))}
       {HKEYS.map(k => <path key={`a-${k}`} d={tracePath(offsetDay, k, true)} fill={`url(#grad-${k})`} clipPath="url(#graph-clip)" />)}
       {HKEYS.map(k => <path key={`l-${k}`} d={tracePath(offsetDay, k, false)} fill="none" stroke={COLORS[k]} strokeWidth={STROKE_W[k]} clipPath="url(#graph-clip)" opacity={STROKE_OP[k]} />)}
-      <line x1={PAD_L} y1={yBase} x2={PAD_L + innerW} y2={yBase} stroke="rgba(0,0,0,0.08)" strokeWidth={1} />
-      <line x1={PAD_L} y1={PAD_TOP} x2={PAD_L} y2={yBase} stroke="rgba(0,0,0,0.08)" strokeWidth={1} />
+      <line x1={PAD_L} y1={yBase} x2={PAD_L + innerW} y2={yBase} stroke="rgba(28,23,20,0.07)" strokeWidth={1} />
+      <line x1={PAD_L} y1={PAD_TOP} x2={PAD_L} y2={yBase} stroke="rgba(28,23,20,0.07)" strokeWidth={1} />
       {phaseItems.map(({ name, cx, x1, clipX, clipW }, i) => (
         <g key={i}>
           <clipPath id={`pc-${i}`}><rect x={clipX} y={yBase} width={clipW} height={PAD_PHASE} /></clipPath>
-          <line x1={x1} y1={yBase} x2={x1} y2={yBase + PAD_PHASE} stroke="rgba(0,0,0,0.04)" strokeWidth={1} />
-          <text x={cx} y={yBase + PAD_PHASE - 4} textAnchor="middle" fontSize={7.5} fill="rgba(0,0,0,0.25)" letterSpacing="0.04em" clipPath={`url(#pc-${i})`}>{name}</text>
+          <line x1={x1} y1={yBase} x2={x1} y2={yBase + PAD_PHASE} stroke="rgba(196,168,136,0.18)" strokeWidth={1} />
+          <text x={cx} y={yBase + PAD_PHASE - 4} textAnchor="middle" fontSize={7.5} fill="rgba(28,23,20,0.22)" letterSpacing="0.04em" clipPath={`url(#pc-${i})`}>{name}</text>
         </g>
       ))}
-      {dayTicks.map(({ label, x }, i) => <text key={i} x={x} y={yBase + PAD_PHASE + PAD_DAYS - 6} textAnchor="middle" fontSize={7.5} fill="rgba(0,0,0,0.25)" letterSpacing="0.02em">{label}</text>)}
+      {dayTicks.map(({ label, x }, i) => <text key={i} x={x} y={yBase + PAD_PHASE + PAD_DAYS - 6} textAnchor="middle" fontSize={7.5} fill="rgba(28,23,20,0.22)" letterSpacing="0.02em">{label}</text>)}
       <g transform={`translate(${PAD_L + innerW - 6}, 10)`}>
         {COLOR_LABELS.map(([k, label], i) => (
           <g key={k}><line x1={-108} y1={i * 13} x2={-94} y2={i * 13} stroke={COLORS[k]} strokeWidth={STROKE_W[k]} opacity={STROKE_OP[k]} /><text x={-90} y={i * 13 + 3.5} fontSize={8} fill={COLORS[k]} textAnchor="start" opacity={0.7} letterSpacing="0.02em">{label}</text></g>
@@ -306,22 +306,28 @@ function ensureStyles() {
   el.id = STYLE_ID;
   el.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap');
-    @keyframes mc-glow { 0%, 100% { opacity: 0.85; } 50% { opacity: 1; } }
-    @keyframes mc-bounce { 0%, 100% { transform: translateY(0); opacity: 0.4; } 50% { transform: translateY(6px); opacity: 0.7; } }
-    @keyframes mc-fadein { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes mc-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
-    .mc-input { background: none; border: none; border-bottom: 1px solid rgba(180,140,140,0.3); font-family: 'Source Serif 4', Georgia, serif; font-size: 1rem; color: #555; padding: 0.4rem 0.2rem; outline: none; transition: border-color 0.3s; }
-    .mc-input:focus { border-bottom-color: #c46b8f; }
-    .mc-input::-webkit-calendar-picker-indicator { filter: opacity(0.4); }
-    .mc-start-btn { background: none; border: 1px solid rgba(180,140,140,0.35); border-radius: 24px; padding: 0.6rem 2.2rem; font-family: 'Source Serif 4', Georgia, serif; font-size: 1rem; font-weight: 400; color: #5a4040; cursor: pointer; letter-spacing: 0.04em; transition: all 0.4s ease; }
-    .mc-start-btn:hover { background: rgba(196,107,143,0.06); border-color: #c46b8f; color: #c46b8f; }
+    @keyframes mc-glow { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
+    @keyframes mc-bounce { 0%, 100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(4px); opacity: 0.55; } }
+    @keyframes mc-fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes mc-pulse { 0%, 100% { opacity: 0.2; } 50% { opacity: 0.5; } }
+    .mc-input { background: none; border: none; border-bottom: 1px solid rgba(196,168,136,0.35); font-family: 'Source Serif 4', Georgia, serif; font-size: 0.95rem; color: #3d3028; padding: 0.55rem 0.3rem; outline: none; transition: border-color 0.5s ease; letter-spacing: 0.01em; text-align: center; }
+    .mc-input:focus { border-bottom-color: #b85c7a; }
+    .mc-input::-webkit-calendar-picker-indicator { filter: opacity(0.3); }
+    .mc-start-btn { background: none; border: 1px solid rgba(196,168,136,0.5); border-radius: 0; padding: 0.85rem 3rem; font-family: 'Source Serif 4', Georgia, serif; font-size: 0.85rem; font-weight: 400; color: #3d3028; cursor: pointer; letter-spacing: 0.12em; text-transform: uppercase; transition: all 0.5s ease; text-align: center; }
+    .mc-start-btn:hover { background: rgba(196,168,136,0.08); border-color: #c4a882; color: #1c1714; letter-spacing: 0.14em; }
   `;
   document.head.appendChild(el);
 }
 
-function formatLocalDatetime(d: Date): string {
+function formatLocalDate(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function parseDateInput(s: string): Date {
+  if (!s) return new Date();
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d);
 }
 
 function useScrollStage(maxProgress: number) {
@@ -358,10 +364,11 @@ export default function MenstrualClock() {
   }, []);
 
   const [clockUnlocked, setClockUnlocked] = useState(false);
+  const [clockSettled, setClockSettled] = useState(false);
   const maxProgress = clockUnlocked ? 999 : 3.5;
   const { progress, vh } = useScrollStage(maxProgress);
 
-  const [cycleStart, setCycleStart] = useState(() => formatLocalDatetime(new Date()));
+  const [cycleStart, setCycleStart] = useState(() => formatLocalDate(new Date()));
   const [cycleDuration, setCycleDuration] = useState(28);
   const [dayFrac, setDayFrac] = useState(1.0);
   const [speedIdx, setSpeedIdx] = useState(4);
@@ -372,7 +379,7 @@ export default function MenstrualClock() {
   const lastTsRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
 
-  const cycleStartDate = new Date(cycleStart || Date.now());
+  const cycleStartDate = parseDateInput(cycleStart);
 
   const speed = SPEED_STEPS[speedIdx];
   const tick = useCallback((ts: number) => {
@@ -418,28 +425,39 @@ export default function MenstrualClock() {
 
   const graphH = isMobile ? 220 : poemHeight;
   const font = "'Source Serif 4', Georgia, serif";
-  const fontSize = isMobile ? '1.05rem' : '1.3rem';
-  const bg = '#ffffff';
-  const gradientBar = `linear-gradient(90deg, ${COLORS.e}, ${COLORS.p}, ${COLORS.lh}, ${COLORS.fsh}, ${COLORS.test})`;
+  const fontSize = isMobile ? '1.1rem' : '1.35rem';
+  const bg = '#faf8f5';
+  const gradientBar = '#c4a882';
 
   const p = progress;
 
   const titleY = lerp(0, -20, (p - 0.3) / 0.7);
   const titleOp = lerp(1, 0, (p - 2) / 0.5);
-  const titleScale = lerp(1, 0.65, (p - 0.2) / 0.8);
+  const titleScale = lerp(1, 0.72, (p - 0.2) / 0.8);
 
-  const descOp = p < 0.5 ? 0 : p < 1 ? lerp(0, 1, (p - 0.5) / 0.5) : p < 2 ? 1 : lerp(1, 0, (p - 2) / 0.5);
-  const descY = p < 0.5 ? 20 : p < 1 ? lerp(20, 0, (p - 0.5) / 0.5) : p < 2 ? 0 : lerp(0, -15, (p - 2) / 0.5);
+  const descOp = isMobile
+    ? (p < 1 ? 0 : p < 1.5 ? lerp(0, 1, (p - 1) / 0.5) : p < 2 ? 1 : lerp(1, 0, (p - 2) / 0.5))
+    : (p < 0.5 ? 0 : p < 1 ? lerp(0, 1, (p - 0.5) / 0.5) : p < 2 ? 1 : lerp(1, 0, (p - 2) / 0.5));
+  const descY = isMobile
+    ? (p < 1 ? 20 : p < 1.5 ? lerp(20, 0, (p - 1) / 0.5) : p < 2 ? 0 : lerp(0, -15, (p - 2) / 0.5))
+    : (p < 0.5 ? 20 : p < 1 ? lerp(20, 0, (p - 0.5) / 0.5) : p < 2 ? 0 : lerp(0, -15, (p - 2) / 0.5));
 
   const settingsOp = p < 2 ? 0 : p < 2.5 ? lerp(0, 1, (p - 2) / 0.5) : p < 3.5 ? 1 : lerp(1, 0, (p - 3.5) / 0.5);
   const settingsY = p < 2 ? 20 : p < 2.5 ? lerp(20, 0, (p - 2) / 0.5) : p < 3.5 ? 0 : lerp(0, -15, (p - 3.5) / 0.5);
 
   const clockOp = p < 3.5 ? 0 : lerp(0, 1, (p - 3.5) / 0.5);
-  const clockY = p < 3.5 ? 30 : lerp(30, 0, (p - 3.5) / 0.5);
+  const clockY = p < 3.5 ? 20 : lerp(20, 0, (p - 3.5) / 0.5);
 
   const chevronOp = lerp(1, 0, (p - 0.1) / 0.3);
 
   const isClockPhase = p >= 4;
+
+  useEffect(() => {
+    if (clockUnlocked && isClockPhase && !clockSettled) {
+      setClockSettled(true);
+      window.scrollTo(0, 0);
+    }
+  }, [clockUnlocked, isClockPhase, clockSettled]);
 
   const handleStart = () => {
     setClockUnlocked(true);
@@ -451,46 +469,46 @@ export default function MenstrualClock() {
   if (!loaded) {
     return (
       <div style={{ backgroundColor: bg, minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ width: isMobile ? 48 : 72, height: 2, background: gradientBar, borderRadius: 1, animation: 'mc-pulse 2s ease-in-out infinite' }} />
+        <div style={{ width: isMobile ? 40 : 60, height: 1, background: gradientBar, borderRadius: 0, animation: 'mc-pulse 2.5s ease-in-out infinite' }} />
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundColor: bg, minHeight: '100vh', boxSizing: 'border-box', animation: 'mc-fadein 0.6s ease' }}>
-      <div style={{ height: `${(clockUnlocked ? 6 : 4.5) * vh}px`, pointerEvents: 'none' }} />
+    <div style={{ backgroundColor: bg, minHeight: '100vh', boxSizing: 'border-box', animation: 'mc-fadein 1s ease' }}>
+      {!clockSettled && <div style={{ height: `${(clockUnlocked ? 6 : 4.5) * vh}px`, pointerEvents: 'none' }} />}
 
-      {!isClockPhase && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: bg, zIndex: 1, padding: isMobile ? '2rem 1.25rem' : '4rem 3.5rem', overflow: 'hidden' }}>
+      {!clockSettled && !isClockPhase && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: bg, zIndex: 1, padding: isMobile ? '3rem 1.5rem' : '5rem 5rem', overflow: 'hidden' }}>
 
           {titleOp > 0.01 && (
-            <div style={{ opacity: Math.max(0, titleOp), transform: `translateY(${titleY}vh) scale(${titleScale})`, textAlign: 'center', position: 'absolute', top: '38%', left: '50%', marginLeft: '-50%', width: '100%', padding: isMobile ? '0 1rem' : '0 3rem' }}>
-              <h1 style={{ fontFamily: font, fontSize: isMobile ? '2.8rem' : '4.5rem', fontWeight: 300, color: '#2a2024', letterSpacing: '-0.03em', lineHeight: 1.15, margin: 0 }}>
+            <div style={{ opacity: Math.max(0, titleOp), transform: `translateY(${titleY}vh) scale(${titleScale})`, textAlign: 'center', position: 'absolute', top: '40%', left: '50%', marginLeft: '-50%', width: '100%', padding: isMobile ? '0 1rem' : '0 3rem' }}>
+              <h1 style={{ fontFamily: font, fontSize: isMobile ? '3.2rem' : '5rem', fontWeight: 300, color: '#1c1714', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
                 Menstrual Clock
               </h1>
-              <div style={{ width: isMobile ? 56 : 90, height: 2, background: gradientBar, margin: '1.2rem auto 0', borderRadius: 1 }} />
-              <div style={{ marginTop: '1rem', fontFamily: font, fontSize: isMobile ? '0.9rem' : '1.05rem', color: '#7a6a6a', fontWeight: 300, fontStyle: 'italic' }}>
+              <div style={{ width: isMobile ? 48 : 72, height: 1, background: gradientBar, margin: '1.6rem auto 0', borderRadius: 0 }} />
+              <div style={{ marginTop: '1.4rem', fontFamily: font, fontSize: isMobile ? '0.8rem' : '0.9rem', color: '#8a7a6a', fontWeight: 300, fontStyle: 'italic', letterSpacing: '0.06em' }}>
                 by Luna Maltseva &amp; Daria Yurishcheva
               </div>
             </div>
           )}
 
           {chevronOp > 0 && (
-            <div style={{ position: 'absolute', bottom: '3rem', opacity: Math.max(0, chevronOp), animation: 'mc-bounce 2.5s ease-in-out infinite' }}>
+            <div style={{ position: 'absolute', bottom: '3rem', opacity: Math.max(0, chevronOp), animation: 'mc-bounce 3.5s ease-in-out infinite' }}>
               <ChevronDown />
             </div>
           )}
 
           {descOp > 0.01 && (
-            <div style={{ opacity: descOp, position: 'absolute', top: '42%', left: '50%', width: '100%', maxWidth: 960, padding: isMobile ? '0 1.5rem' : '0 3rem', transform: `translate(-50%, 0) translateY(${descY}px)`, textAlign: 'left' }}>
-              <div style={{ fontFamily: font, fontSize: isMobile ? '0.95rem' : '1.1rem', color: '#4a3a3a', lineHeight: 2, fontWeight: 300 }}>
+            <div style={{ opacity: descOp, position: 'absolute', top: isMobile ? '32%' : '40%', left: '50%', width: '100%', maxWidth: 820, padding: isMobile ? '0 1.5rem' : '0 3rem', transform: `translate(-50%, 0) translateY(${descY}px)`, textAlign: 'left' }}>
+              <div style={{ fontFamily: font, fontSize: isMobile ? '0.95rem' : '1.1rem', color: '#3d3028', lineHeight: 2.1, fontWeight: 300 }}>
                 <p style={{ margin: 0 }}>
                   Though it may at first seem complicated, the Menstrual Clock makes use of the composite nature of the menstrual cycle to tell time. Based on hormonal levels of Estrogen, Progesterone, and Luteinizing Hormone, attained from averaging a PhysioNet self-report sample, the clock selects parts of the 14 excerpts from poems written by female authors, composing a sentence that can be used to communicate time.
                 </p>
-                <p style={{ margin: '1.2rem 0 0 0' }}>
+                <p style={{ margin: '1.5rem 0 0 0' }}>
                   Hormones are color-coded: Estrogen in pink, Progesterone in yellow, and Luteinizing Hormone in blue. Depending on the time of the cycle, levels of these hormones increase or decrease. The clock displays different quotes based on the levels of different hormones. The quote height is determined by the hormone level.
                 </p>
-                <p style={{ margin: '1.2rem 0 0 0' }}>
+                <p style={{ margin: '1.5rem 0 0 0' }}>
                 The selected quotes vary in emotional intensity, as mood often depends on hormonal levels during different phases of the cycle.
                 </p>
               </div>
@@ -498,21 +516,25 @@ export default function MenstrualClock() {
           )}
 
           {settingsOp > 0.01 && (
-            <div style={{ opacity: settingsOp, position: 'absolute', top: '55%', left: '50%', transform: `translate(-50%, -50%) translateY(${settingsY}px)`, textAlign: 'center' }}>
-              <div style={{ fontFamily: font, fontSize: isMobile ? '1.1rem' : '1.3rem', fontWeight: 300, color: '#2a2024', marginBottom: '2rem' }}>
+            <div style={{ opacity: settingsOp, position: 'absolute', top: '50%', left: '50%', transform: `translate(-50%, -50%) translateY(${settingsY}px)`, textAlign: 'center' }}>
+              <div style={{ fontFamily: "'DM Mono', monospace", fontSize: isMobile ? '0.65rem' : '0.65rem', fontWeight: 300, color: '#1c1714', marginBottom: '2.5rem', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
                 Configure your cycle
               </div>
-              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '2rem' : '3rem', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.7rem', color: '#7a6a6a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Cycle start</label>
-                  <input type="datetime-local" className="mc-input" value={cycleStart} onChange={e => setCycleStart(e.target.value)} style={{ fontFamily: font, fontSize: '1rem', color: '#555', width: isMobile ? '200px' : '220px' }} />
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '2.5rem' : '4rem', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.65rem', color: '#8a7a6a', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Cycle start</label>
+                  <input type="date" className="mc-input" value={cycleStart} onChange={e => setCycleStart(e.target.value)} style={{ fontFamily: font, fontSize: '0.95rem', color: '#3d3028', width: isMobile ? '180px' : '200px' }} />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
-                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.7rem', color: '#7a6a6a', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Cycle length (days)</label>
-                  <input type="number" className="mc-input" min={21} max={35} value={cycleDuration} onChange={e => setCycleDuration(Math.max(21, Math.min(35, Number(e.target.value) || 28)))} style={{ fontFamily: font, fontSize: '1rem', color: '#555', width: '80px', textAlign: 'center' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+                  <label style={{ fontFamily: "'DM Mono', monospace", fontSize: '0.65rem', color: '#8a7a6a', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Cycle length (days)</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <button onClick={() => setCycleDuration(d => Math.max(21, d - 1))} style={{ background: 'none', border: '1px solid rgba(196,168,136,0.35)', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', fontFamily: font, fontSize: '1.1rem', color: '#8a7a6a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, lineHeight: 1 }}>−</button>
+                    <span style={{ fontFamily: font, fontSize: '1rem', color: '#3d3028', minWidth: '2.5rem', textAlign: 'center', display: 'inline-block' }}>{cycleDuration}</span>
+                    <button onClick={() => setCycleDuration(d => Math.min(35, d + 1))} style={{ background: 'none', border: '1px solid rgba(196,168,136,0.35)', borderRadius: '50%', width: 34, height: 34, cursor: 'pointer', fontFamily: font, fontSize: '1.1rem', color: '#8a7a6a', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, lineHeight: 1 }}>+</button>
+                  </div>
                 </div>
               </div>
-              <div style={{ marginTop: '2.5rem' }}>
+              <div style={{ marginTop: '3.5rem' }}>
                 <button className="mc-start-btn" onClick={handleStart}>
                   Start the clock
                 </button>
@@ -522,7 +544,17 @@ export default function MenstrualClock() {
         </div>
       )}
 
-      <div style={{
+      <div style={clockSettled ? {
+        position: 'relative',
+        left: 0, right: 0,
+        opacity: 1,
+        backgroundColor: bg,
+        zIndex: 0,
+        pointerEvents: 'auto',
+        minHeight: '100vh',
+        padding: isMobile ? '3rem 1.5rem 3rem' : '4.5rem 5rem 3.5rem',
+        boxSizing: 'border-box',
+      } : {
         position: isClockPhase ? 'relative' : 'fixed',
         top: isClockPhase ? 'auto' : 0,
         left: 0, right: 0,
@@ -533,19 +565,19 @@ export default function MenstrualClock() {
         zIndex: isClockPhase ? 0 : 1,
         pointerEvents: isClockPhase ? 'auto' : 'none',
         minHeight: '100vh',
-        padding: isMobile ? '2rem 1.25rem 2rem' : '3rem 3.5rem 2rem',
-        boxSizing: 'border-box',
+        padding: isMobile ? '3rem 1.5rem 3rem' : '4.5rem 5rem 3.5rem',
+        boxSizing: 'border-box'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '2rem' : '3rem' }}>
-          <div style={{ fontFamily: font, fontSize: isMobile ? '1.1rem' : '1.3rem', color: '#2a2024', fontStyle: 'italic', fontWeight: 400, lineHeight: 1.8, animation: 'mc-glow 4s ease-in-out infinite' }}>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '2.8rem' : '4rem' }}>
+          <div style={{ fontFamily: font, fontSize: isMobile ? '1.15rem' : '1.4rem', color: '#1c1714', fontStyle: 'italic', fontWeight: 300, lineHeight: 2, letterSpacing: '0.01em', animation: 'mc-glow 7s ease-in-out infinite' }}>
             {sentence}
           </div>
-          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: isMobile ? '0.7rem' : '0.75rem', color: '#8a7a7a', marginTop: '0.4rem', letterSpacing: '0.05em' }}>
+          <div style={{ fontFamily: "'DM Mono', monospace", fontSize: isMobile ? '0.68rem' : '0.72rem', color: '#a89888', marginTop: '0.6rem', letterSpacing: '0.08em' }}>
             {timeRange}
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '2rem' : '3.5rem', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '2.5rem' : '5rem', alignItems: 'flex-start' }}>
           <div style={{ flex: '0 0 auto', minWidth: 0, width: isMobile ? '100%' : undefined }}>
             <div ref={poemLinesRef}>
               {POEMS.map((line, i) => {
@@ -555,9 +587,9 @@ export default function MenstrualClock() {
                 const indices = [eIdx, pIdx, fshIdx, lhIdx, testIdx];
                 for (let j = 0; j < 5; j++) { if (indices[j] === i) hl.push({ phrase: ALL_WORDS[j][i], color: COLORS[keys[j]] }); }
                 return (
-                  <div key={i} style={{ marginBottom: isMobile ? '0.4rem' : '0.6rem', position: 'relative', cursor: 'default' }}
+                  <div key={i} style={{ marginBottom: isMobile ? '0.55rem' : '0.75rem', position: 'relative', cursor: 'default' }}
                     onMouseEnter={() => setHoveredLine(i)} onMouseLeave={() => setHoveredLine(null)}>
-                    <span style={{ fontFamily: font, fontSize, color: '#2a2024', lineHeight: 1.75, opacity: active ? 1 : 0.12, fontWeight: active ? 500 : 300, letterSpacing: '-0.01em' }}>
+                    <span style={{ fontFamily: font, fontSize, color: '#1c1714', lineHeight: 1.9, opacity: active ? 1 : 0.08, fontWeight: active ? 400 : 300, letterSpacing: '-0.01em' }}>
                       {renderLine(line, hl)}
                     </span>
                     {hoveredLine === i && <PoemTooltip poem={POEM_DATA[i]} isMobile={isMobile} />}
@@ -570,7 +602,7 @@ export default function MenstrualClock() {
           <div ref={graphColRef} style={{ flex: isMobile ? '0 0 auto' : '1 1 0', minWidth: 0, width: isMobile ? '100%' : undefined }}>
             <CycleGraph offsetDay={offsetDay} width={graphW} height={graphH} cycleStartDate={cycleStartDate} cycleDuration={cycleDuration}
               onDragStart={handleDragStart} onDragMove={handleDragMove} onDragEnd={handleDragEnd} />
-            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
               <div style={{ flex: 1 }} />
               <IconBtn holdable onClick={() => setSpeedIdx(i => Math.min(SPEED_STEPS.length - 1, i + 1))} disabled={speedIdx >= SPEED_STEPS.length - 1} title="Slower"><SlowerIcon /></IconBtn>
               <IconBtn onClick={() => setPaused(p => !p)} title={paused ? 'Play' : 'Pause'}>{paused ? <PlayIcon /> : <PauseIcon />}</IconBtn>
@@ -580,7 +612,7 @@ export default function MenstrualClock() {
             </div>
           </div>
         </div>
-        <div style={{ marginTop: isMobile ? '1.2rem' : '1.5rem', fontFamily: "'DM Mono', monospace", fontSize: isMobile ? '0.7rem' : '0.75rem', color: '#7a6a6a', letterSpacing: '0.03em', marginBottom: 0 }}>
+        <div style={{ marginTop: isMobile ? '1.8rem' : '2rem', fontFamily: "'DM Mono', monospace", fontSize: isMobile ? '0.68rem' : '0.72rem', color: '#a89888', letterSpacing: '0.07em', marginBottom: 0 }}>
           Next predicted menstrual phase: {nextPeriodDate}
         </div>
       </div>
