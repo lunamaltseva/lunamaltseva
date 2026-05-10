@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
     dropdown: [
       { label: 'Nuclear Decay Sim', href: '/decay' },
       { label: 'Menstrual Clock', href: '/menstrualclock' },
+      { label: 'Breaking News', href: '/breakingnews' },
     ],
   },
 ];

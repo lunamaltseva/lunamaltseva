@@ -10,6 +10,7 @@ import Design from './pages/Design';
 import Programming from './pages/Programming';
 import Redirect from './pages/r';
 import MenstrualClock from './pages/MenstrualClock';
+import BreakingNews from './pages/BreakingNews';
 import NotFound from './pages/NotFound';
 
 const Decay = lazy(() => import('./pages/Decay'));
@@ -35,6 +36,7 @@ function App() {
             <Route path="/programming" element={<Programming />} />
             <Route path="/r" element={<Redirect />} />
             <Route path="/decay" element={<Suspense fallback={<div style={{ background: '#000', minHeight: '100vh' }} />}><Decay /></Suspense>} />
+            <Route path="/breakingnews" element={<BreakingNews />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
