@@ -16,19 +16,19 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'About Me', href: '/about' },
   {
-    label: 'Writing',
+    label: 'Works',
     dropdown: [
       { label: 'Academic', href: '/writing/academic' },
       { label: 'Fiction', href: '/writing/fiction' },
+      { label: 'Design', href: '/design' },
     ],
   },
-  { label: 'Design', href: '/design' },
-  { label: 'Programming', href: '/programming' },
   {
-    label: 'Misc',
-    rightAligned: true,
+    label: 'Programming',
     dropdown: [
-      { label: 'Nuclear Decay Sim', href: '/decay' },
+      { label: 'Artemis CE', href: '/rtmsce' },
+      { label: 'ScheduleWhen', href: 'https://schedulewhen.net' },
+      { label: 'Nuclear Decay Visualizer', href: '/decay' },
       { label: 'Menstrual Clock', href: '/menstrualclock' },
       { label: 'Breaking News', href: '/breakingnews' },
     ],

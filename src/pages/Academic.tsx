@@ -107,6 +107,14 @@ const sections: AcademicSection[] = [
         description: 'Despite the diabolical portrayal the Chinese Social Credit System (SCS) received in Western democratic media, recent surveys have shown that less than one percent of Chinese citizens disapprove of the SCS. To find the grassroots of this astounding statistic, this paper delves into Chinese culture, exploring its notion of privacy and civil ideals, as well as analyzing Chinese history, the Chinese crisis of trust, and the radical steps the Chinese Communist Party has taken to bring the situation under control. This paper will argue that Chinese citizens overwhelmingly approve of the SCS because of the Chinese Communist Party\'s media control, social deterrence, and authority.',
         pdfUrl: '/Harmony or Hegemony.pdf',
       },
+      {
+        title: 'Reception of Yeats’s “Sailing to Byzantium” Among College Students',
+        language: 'English',
+        publication: 'Course: Critical Approaches in Modern Media',
+        date: 'May 2026',
+        description: 'Per Lüdtke, poetry is traditionally a medium with a great amount of interpretative variability between readers (2014). The root cause of this phenomenon, often referred to by reception theorists as “hermeneutic depth,” is especially heightened in the case of “Sailing to Byzantium,” where the viscosity of the lines makes the task of interpretation almost insurmountable to an inexperienced reader. Because of that, it is sometimes said that poetry is an acquired pleasure, one which young people lack the introspective capacity to appreciate. The accuracy of this statement can be put to test. This paper will address the following question: How do college students understand such a complex work of poetry as “Sailing to Byzantium”? This paper will apply reception theory to a series of four interviews with college students to argue that while college students are able to make sense of complex texts, that limited understanding hinges on their familiarity with critical analysis and social institutions.',
+        pdfUrl: '/STB Analysis.pdf',
+      },
     ],
   },
   {

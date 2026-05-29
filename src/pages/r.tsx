@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export default function Redirect() {
   useEffect(() => {
-    window.location.replace('https://docs.google.com/presentation/d/137V-SmNFHMV9aUbHC7aFpiK_qTvK_3KBaRE5S4gu_Fw/edit?usp=sharing');
+    window.location.replace('https://schedulewhen.net');
   }, []);
 
   return (

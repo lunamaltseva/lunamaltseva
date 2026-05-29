@@ -1,4 +1,9 @@
+import { useIsMobile } from '../hooks/useIsMobile';
+
 export default function BreakingNews() {
+  const isMobile = useIsMobile();
+  const px = isMobile ? '1rem' : '2rem';
+
   return (
     <div style={{
       backgroundColor: '#000000',
@@ -11,7 +16,7 @@ export default function BreakingNews() {
       <div style={{
         borderTop: '3px solid #ffffff',
         borderBottom: '1px solid #ffffff',
-        padding: '0.75rem 2rem',
+        padding: `0.75rem ${px}`,
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -32,24 +37,24 @@ export default function BreakingNews() {
       <div style={{
         maxWidth: '960px',
         margin: '0 auto',
-        padding: '1.5rem 2rem 0',
+        padding: `1.5rem ${px} 0`,
         textAlign: 'center',
         borderBottom: '3px double #ffffff',
         paddingBottom: '1.25rem',
       }}>
         <div style={{
           fontFamily: 'var(--font-title, Georgia, serif)',
-          fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+          fontSize: 'clamp(1.75rem, 6vw, 3.5rem)',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
           fontWeight: 700,
           lineHeight: 1,
         }}>
-          The Arch User Tribune
+          Arch User Tribune
         </div>
         <div style={{
           fontSize: '0.7rem',
-          letterSpacing: '0.2em',
+          letterSpacing: isMobile ? '0.1em' : '0.2em',
           textTransform: 'uppercase',
           marginTop: '0.4rem',
           opacity: 0.6,
@@ -62,7 +67,7 @@ export default function BreakingNews() {
       <div style={{
         maxWidth: '960px',
         margin: '0 auto',
-        padding: '0.6rem 2rem',
+        padding: `0.6rem ${px}`,
         borderBottom: '1px solid rgba(255,255,255,0.3)',
         display: 'flex',
         alignItems: 'center',
@@ -77,6 +82,7 @@ export default function BreakingNews() {
           textTransform: 'uppercase',
           fontWeight: 700,
           padding: '0.2rem 0.55rem',
+          flexShrink: 0,
         }}>
           Breaking News
         </span>
@@ -86,36 +92,37 @@ export default function BreakingNews() {
       </div>
 
       {/* Headline block */}
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 2rem 0' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: `${isMobile ? '1.5rem' : '2rem'} ${px} 0` }}>
         <h1 style={{
-          fontSize: 'clamp(1.8rem, 5vw, 3.25rem)',
-          lineHeight: 1.1,
+          fontSize: 'clamp(1.6rem, 5vw, 3.25rem)',
+          lineHeight: 1.15,
           fontWeight: 700,
           letterSpacing: '-0.01em',
           margin: '0 0 1rem',
           color: '#ffffff',
         }}>
-          Arch Linux to Require a Monthly Subscription Fee;
-          Users Declare the Distro "Spiritually Dead"
+          Arch Linux, Once a Citadel of Open-Source Principle,
+          Introduces Subscription Fees and a Bundled A.I. Chatbot,
+          Igniting a Sweeping User Exodus
         </h1>
 
         <p style={{
-          fontSize: 'clamp(1rem, 2.2vw, 1.25rem)',
+          fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
           lineHeight: 1.5,
           color: 'rgba(255,255,255,0.75)',
           margin: '0 0 1.25rem',
           fontStyle: 'italic',
-          maxWidth: '700px',
         }}>
-          The once-revered minimalist distribution upends its founding philosophy, triggering a mass exodus of
-          the very users who built its legendary reputation.
+          The venerable Linux distribution, long prized among practitioners for its radical configurability
+          and philosophical austerity, has pivoted sharply toward a commercial model that its most devoted
+          adherents are calling an act of institutional betrayal.
         </p>
 
         {/* Byline */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '1.25rem',
+          gap: isMobile ? '0.6rem' : '1.25rem',
           borderTop: '1px solid rgba(255,255,255,0.25)',
           borderBottom: '1px solid rgba(255,255,255,0.25)',
           padding: '0.6rem 0',
@@ -124,11 +131,11 @@ export default function BreakingNews() {
           <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', fontWeight: 600 }}>
             By Luna Maltseva
           </span>
-          <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.5 }}>|</span>
+          {!isMobile && <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.5 }}>|</span>}
           <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.6 }}>
             May 10, 2026, 08:43 UTC
           </span>
-          <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.5 }}>|</span>
+          {!isMobile && <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.5 }}>|</span>}
           <span style={{ fontSize: '0.8rem', fontFamily: '"Helvetica Neue", Arial, sans-serif', opacity: 0.6 }}>
             2 min read
           </span>
@@ -139,28 +146,46 @@ export default function BreakingNews() {
       <div style={{
         maxWidth: '960px',
         margin: '0 auto',
-        padding: '2rem 2rem 0',
+        padding: `${isMobile ? '1.5rem' : '2rem'} ${px} 0`,
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)',
-        gap: '2.5rem',
+        gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 2fr) minmax(0, 1fr)',
+        gap: isMobile ? '0' : '2.5rem',
         alignItems: 'start',
       }}>
         {/* Main column */}
         <div>
           {/* — PARAGRAPH 1 — */}
           <p style={bodyText}>
-            In a surprising move, the Arch Linux development team greenlit the inclusion of its
-            <code style={{ fontFamily: 'monospace', fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.3rem' }}>arch-monetize</code> 
-            package in the base installation, introducing a mandatory monthly subscription fee of $7.99 to access baseline system functionality,
-            such as system updates, access to the AUR, and desktop environment choice. The announcement, made on a Saturday evening with no prior community discussion, 
-            has sent shockwaves through the Arch user base, many of whom have been vocal about their disapproval on forums and social media.
+            SAN FRANCISCO — Arch Linux, the two-decade-old Linux distribution long venerated by
+            computing professionals for its exacting minimalism and uncompromising commitment to user
+            agency, announced on Saturday that it would impose a mandatory recurring subscription of
+            $7.99 per month beginning with its May 2026 installation image — a measure the project's
+            core maintainers described, in a brief communiqué posted to its official mailing list, as
+            "a necessary step toward financial sustainability." The fee gates access to what the
+            distribution has historically furnished without charge: package updates delivered through
+            the{' '}
+            <code style={{ fontFamily: 'monospace', fontSize: '0.8rem', background: 'rgba(255,255,255,0.1)', padding: '0.1rem 0.3rem' }}>pacman</code>
+            {' '}command-line utility, the sprawling Arch User Repository — commonly
+            abbreviated the A.U.R., a community-maintained catalogue encompassing more than 80,000
+            software packages — and the ability to configure and initialize a graphical desktop
+            environment.
           </p>
 
           {/* — PARAGRAPH 2 — */}
           <p style={bodyText}>
-            Many in the community are rightfully appaled and shocked: after all, Arch Linux's core principle has always been
-            user-centricity. The motivation behind the move is still unclear, though it is suspected that Arch maintainers have
-            drawn inspiration from other moves by giants in the tech industry.
+            The announcement — posted without prior consultation to the project's governance forums at
+            approximately 11:40 p.m. Pacific time on a Saturday, a disclosure timing that several
+            longtime contributors noted bore the hallmarks of a decision the maintainers did not wish
+            to invite broad deliberation of — arrived alongside a second revelation that proved, by
+            most measures, the more incendiary of the two: the inclusion, also bundled by default
+            into the base installation, of{' '}
+            <em>ArchGPT-CE</em>, a large-language-model-powered
+            conversational assistant that the maintainers described as "a friendly guide for new and
+            experienced users alike." The motivation behind the dual announcements remains publicly
+            unacknowledged by project leadership; observers within the open-source community have
+            speculated, with varying degrees of charity, that the Arch maintainers drew inspiration
+            from monetization pivots undertaken in recent years by enterprises including Red Hat,
+            Canonical and, more distantly, Mozilla.
           </p>
 
           {/* Pull quote */}
@@ -170,7 +195,7 @@ export default function BreakingNews() {
             padding: '0.75rem 1.5rem',
           }}>
             <p style={{
-              fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+              fontSize: 'clamp(1.05rem, 2.5vw, 1.5rem)',
               lineHeight: 1.4,
               fontStyle: 'italic',
               margin: 0,
@@ -193,14 +218,23 @@ export default function BreakingNews() {
 
           {/* — PARAGRAPH 3 — */}
           <p style={bodyText}>
-            The broader ramifications of this decision are yet unclear; it is, nonetheless, observed that many users have
-            chosen to distance themselves from their former distribution of choice. Experts project that in the nearby future
-            we will see a further increase in jumps to similar-to-Arch distributions, such as Gentoo and Void Linux. 
+            The broader ramifications of the decision are, as of this writing, still crystallizing —
+            though early indicators suggest a significant realignment within the Linux desktop
+            ecosystem. StatCounter, a Dublin-based web analytics firm that approximates
+            operating-system adoption through aggregated browser telemetry, recorded a measurable
+            contraction in Arch Linux traffic within 72 hours of the announcement. DistroWatch, an
+            index that tracks distribution popularity through weighted page-view counts, reported
+            that Gentoo Linux and Void Linux — both occupying a philosophical niche adjacent to
+            Arch's own, prizing manual configuration and a lean default footprint — had surged to
+            their highest rankings since the index's founding in 2001. "We have provisioned 14
+            additional servers in the last 48 hours," a Void Linux infrastructure volunteer wrote in
+            a message to the project's IRC channel, appending, in what appeared to be a note of dry
+            amusement, "We were not prepared for this."
           </p>
         </div>
 
         {/* Sidebar */}
-        <aside>
+        <aside style={{ marginTop: isMobile ? '1.5rem' : 0 }}>
           {/* Context box */}
           <div style={{
             border: '1px solid rgba(255,255,255,0.3)',
@@ -271,7 +305,7 @@ export default function BreakingNews() {
       </div>
 
       {/* Continued body — full width below the grid */}
-      <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 2rem' }}>
+      <div style={{ maxWidth: '960px', margin: '0 auto', padding: `0 ${px}` }}>
 
         {/* Second pull quote */}
         <div style={{
@@ -318,7 +352,7 @@ export default function BreakingNews() {
         <figure style={{ margin: '2.5rem 0' }}>
           <div style={{
             border: '1px solid rgba(255,255,255,0.25)',
-            padding: '1rem',
+            padding: isMobile ? '0.5rem' : '1rem',
             background: 'rgba(255,255,255,0.03)',
           }}>
             <img
@@ -335,9 +369,10 @@ export default function BreakingNews() {
             opacity: 0.6,
             fontStyle: 'italic',
           }}>
-            Fig. 1 &mdash; Linux desktop market share by distribution, 2018&ndash;2026. Arch Linux's
-            precipitous decline in May 2026 is visible at the far right of the graph.
-            Source: StatCounter, DistroWatch weighted rankings.
+            Fig. 1 &mdash; Linux desktop distribution market share, 2023&ndash;2026, as approximated
+            by DistroWatch weighted page-view rankings. The precipitous decline of Arch Linux and the
+            concurrent ascent of Gentoo, visible at the graph's right terminus, correspond to the
+            period immediately following the May 2026 announcement. Source: DistroWatch; StatCounter.
           </figcaption>
         </figure>
 
@@ -352,9 +387,9 @@ export default function BreakingNews() {
           marginTop: '3rem',
           paddingTop: '1.25rem',
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          flexWrap: 'wrap',
           gap: '1rem',
         }}>
           <div>
@@ -388,7 +423,6 @@ export default function BreakingNews() {
             fontFamily: '"Helvetica Neue", Arial, sans-serif',
             opacity: 0.4,
             fontStyle: 'italic',
-            alignSelf: 'flex-end',
           }}>
             The Arch User Tribune is a satirical publication. Any resemblance to actual events is
             purely intentional and also extremely funny.

@@ -7,10 +7,10 @@ import Fiction from './pages/Fiction';
 import Academic from './pages/Academic';
 import About from './pages/About';
 import Design from './pages/Design';
-import Programming from './pages/Programming';
 import Redirect from './pages/r';
 import MenstrualClock from './pages/MenstrualClock';
 import BreakingNews from './pages/BreakingNews';
+import RtmsCE from './pages/RtmsCE';
 import NotFound from './pages/NotFound';
 
 const Decay = lazy(() => import('./pages/Decay'));
@@ -19,6 +19,7 @@ function App() {
   return (
     <Routes>
       <Route path="/menstrualclock" element={<MenstrualClock />} />
+      <Route path="/rtmsce" element={<RtmsCE />} />
       <Route path="*" element={
         <div className="app-wrapper">
           <Navbar />
@@ -33,7 +34,6 @@ function App() {
             <Route path="/writing/fiction" element={<Fiction />} />
             <Route path="/writing/academic" element={<Academic />} />
             <Route path="/design" element={<Design />} />
-            <Route path="/programming" element={<Programming />} />
             <Route path="/r" element={<Redirect />} />
             <Route path="/decay" element={<Suspense fallback={<div style={{ background: '#000', minHeight: '100vh' }} />}><Decay /></Suspense>} />
             <Route path="/breakingnews" element={<BreakingNews />} />
