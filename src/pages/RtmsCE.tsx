@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { NAV_ITEMS } from '../components/navData';
+import { ICONS_BY_HREF } from '../components/navIcons';
 
 // ── Brand tokens ──────────────────────────────────────────────────────────────
 const SCARLET  = '#dc2626';
@@ -43,8 +45,88 @@ const TICKER_TEXT = "static preview: not actual system";
 const TICKER_CHUNK = Array(15).fill(TICKER_TEXT).join(" • ") + " • ";
 
 // ── Navbar ────────────────────────────────────────────────────────────────────
+function ThemedDropdown({ label, items, mob }: { label: string; items: { label: string; href: string; external?: boolean }[]; mob: boolean }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div
+      style={{ position: 'relative' }}
+      onMouseEnter={() => !mob && setOpen(true)}
+      onMouseLeave={() => !mob && setOpen(false)}
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          background: open ? 'rgba(255,255,255,0.14)' : 'transparent',
+          border: 'none',
+          color: 'rgba(255,255,255,0.92)',
+          fontSize: '0.9rem',
+          fontFamily: 'inherit',
+          fontWeight: 500,
+          padding: '0.4rem 0.75rem',
+          borderRadius: 4,
+          cursor: 'pointer',
+          whiteSpace: 'nowrap',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.35rem',
+        }}
+      >
+        {label}
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'none' }}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          minWidth: 220,
+          width: 'max-content',
+          background: '#fff',
+          border: `1px solid ${B.gray200}`,
+          borderRadius: 8,
+          boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+          padding: '0.4rem 0',
+          zIndex: 1100,
+        }}>
+          {items.map((item) => {
+            const Icon = ICONS_BY_HREF[item.href];
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.6rem',
+                  padding: '0.55rem 0.9rem',
+                  color: B.gray800,
+                  fontSize: '0.88rem',
+                  fontWeight: 500,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = B.brand50)}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                {Icon && <Icon size={15} style={{ color: BRAND }} />}
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ThemedNavbar() {
   const mob = useIsMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav style={{
       background: SCARLET,
@@ -56,30 +138,111 @@ function ThemedNavbar() {
       height: 56,
       display: 'flex',
       alignItems: 'center',
+      justifyContent: 'flex-start',
+      gap: mob ? '0.5rem' : '2rem',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: mob ? '0.75rem' : '1.5rem', minWidth: 0 }}>
-        <a href="/" style={{ color: '#fff', fontSize: mob ? '1rem' : '1.1rem', fontWeight: 600, letterSpacing: '-0.02em', textDecoration: 'none', flexShrink: 0 }}>
-          Luna Maltseva
-        </a>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', minWidth: 0 }}>
-          {!mob && (
-            <a
-              href="/about"
-              style={{ color: 'rgba(255,255,255,0.82)', fontSize: '0.9rem', fontWeight: 400, padding: '0.4rem 0.75rem', borderRadius: 4, textDecoration: 'none', whiteSpace: 'nowrap' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-            >
-              About Me
-            </a>
-          )}
-          <a
-            href="/rtmsce"
-            style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 600, padding: '0.4rem 0.75rem', borderRadius: 4, background: 'rgba(255,255,255,0.18)', textDecoration: 'none', whiteSpace: 'nowrap' }}
+      <a href="/" style={{ color: '#fff', fontSize: mob ? '1rem' : '1.1rem', fontWeight: 600, letterSpacing: '-0.02em', textDecoration: 'none', flexShrink: 0 }}>
+        Luna Maltseva
+      </a>
+
+      {!mob ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          {NAV_ITEMS.map((item) => {
+            if (item.dropdown) {
+              return <ThemedDropdown key={item.label} label={item.label} items={item.dropdown} mob={mob} />;
+            }
+            const Icon = item.href ? ICONS_BY_HREF[item.href] : undefined;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{
+                  color: 'rgba(255,255,255,0.92)',
+                  fontSize: '0.9rem',
+                  fontWeight: 500,
+                  padding: '0.4rem 0.75rem',
+                  borderRadius: 4,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.14)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                {Icon && <Icon size={15} />}
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+            style={{ background: 'none', border: 'none', color: '#fff', padding: '0.4rem', cursor: 'pointer', display: 'flex', marginLeft: 'auto' }}
           >
-            GE26 RTMS CE
-          </a>
-        </nav>
-      </div>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              {menuOpen ? (
+                <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+              ) : (
+                <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+              )}
+            </svg>
+          </button>
+          {menuOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: '#fff',
+              borderBottom: `1px solid ${B.gray200}`,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              padding: '0.5rem 0',
+              zIndex: 1099,
+            }}>
+              {NAV_ITEMS.flatMap((item) => {
+                if (item.dropdown) {
+                  return [
+                    <div key={`cat-${item.label}`} style={{ padding: '0.7rem 1rem 0.3rem', fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: B.gray500, fontWeight: 600 }}>{item.label}</div>,
+                    ...item.dropdown.map((sub) => {
+                      const Icon = ICONS_BY_HREF[sub.href];
+                      return (
+                        <a
+                          key={sub.href}
+                          href={sub.href}
+                          target={sub.external ? '_blank' : undefined}
+                          rel={sub.external ? 'noopener noreferrer' : undefined}
+                          onClick={() => setMenuOpen(false)}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.6rem 1.25rem', color: B.gray800, fontSize: '0.92rem', fontWeight: 500, textDecoration: 'none' }}
+                        >
+                          {Icon && <Icon size={16} style={{ color: BRAND }} />}
+                          <span>{sub.label}</span>
+                        </a>
+                      );
+                    }),
+                  ];
+                }
+                const Icon = item.href ? ICONS_BY_HREF[item.href] : undefined;
+                return [
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.7rem 1rem', color: B.gray800, fontSize: '0.95rem', fontWeight: 600, textDecoration: 'none' }}
+                  >
+                    {Icon && <Icon size={16} style={{ color: SCARLET }} />}
+                    <span>{item.label}</span>
+                  </a>,
+                ];
+              })}
+            </div>
+          )}
+        </>
+      )}
     </nav>
   );
 }

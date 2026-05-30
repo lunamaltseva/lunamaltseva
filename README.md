@@ -6,8 +6,8 @@ Languages: English (C2), Russian (C1)
 
 ## Reach out
 
-Instagram: [@lunamaltseva](https://instagram.com/lunamaltseva)
-Email: [luna@lunamaltseva.dev](mailto:luna@lunamaltseva.dev)
+- Instagram: [@lunamaltseva](https://instagram.com/lunamaltseva)
+- Email: [luna@lunamaltseva.dev](mailto:luna@lunamaltseva.dev)
 
 > Check my pins!
 

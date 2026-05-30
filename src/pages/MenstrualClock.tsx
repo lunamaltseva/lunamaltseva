@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { NAV_ITEMS } from '../components/navData';
+import { ICONS_BY_HREF } from '../components/navIcons';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 
@@ -699,6 +701,228 @@ function ArtDescription({ isMobile }: { isMobile: boolean }) {
   );
 }
 
+// ─── THEMED NAVBAR ────────────────────────────────────────────────────────────
+
+function MCDropdown({ label, items, isMobile }: { label: string; items: { label: string; href: string; external?: boolean }[]; isMobile: boolean }) {
+  const [open, setOpen] = useState(false);
+  const font = "'Source Serif 4', Georgia, serif";
+  const mono = "'DM Mono', monospace";
+  return (
+    <div
+      style={{ position: 'relative' }}
+      onMouseEnter={() => !isMobile && setOpen(true)}
+      onMouseLeave={() => !isMobile && setOpen(false)}
+    >
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          background: 'none',
+          border: 'none',
+          color: '#3d3028',
+          fontFamily: font,
+          fontSize: '0.85rem',
+          padding: '0.45rem 0.6rem',
+          cursor: 'pointer',
+          letterSpacing: '0.04em',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.35rem',
+          opacity: open ? 1 : 0.78,
+          transition: 'opacity 0.3s',
+        }}
+      >
+        {label}
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'transform 200ms', transform: open ? 'rotate(180deg)' : 'none' }}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          minWidth: 220,
+          width: 'max-content',
+          background: 'rgba(250,248,245,0.97)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(196,168,136,0.25)',
+          borderRadius: 4,
+          boxShadow: '0 8px 32px rgba(28,23,20,0.08)',
+          padding: '0.5rem 0',
+          zIndex: 1100,
+        }}>
+          {items.map((item) => {
+            const Icon = ICONS_BY_HREF[item.href];
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.7rem',
+                  padding: '0.55rem 1rem',
+                  color: '#3d3028',
+                  fontFamily: font,
+                  fontSize: '0.85rem',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  letterSpacing: '0.02em',
+                  transition: 'background 0.25s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(196,168,136,0.1)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                {Icon && <Icon size={15} style={{ color: '#8a7a6a' }} />}
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      )}
+      <span style={{ display: 'none', fontFamily: mono }} />
+    </div>
+  );
+}
+
+function MCNavbar({ isMobile }: { isMobile: boolean }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const font = "'Source Serif 4', Georgia, serif";
+  const mono = "'DM Mono', monospace";
+  return (
+    <nav style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0,
+      zIndex: 1000,
+      background: 'rgba(250,248,245,0.85)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderBottom: '1px solid rgba(196,168,136,0.18)',
+      padding: isMobile ? '0.65rem 1.25rem' : '0.85rem 2rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      gap: isMobile ? '0.5rem' : '2rem',
+    }}>
+      <a href="/" style={{
+        fontFamily: font,
+        fontSize: isMobile ? '0.95rem' : '1rem',
+        fontWeight: 400,
+        color: '#3d3028',
+        textDecoration: 'none',
+        letterSpacing: '0.04em',
+      }}>
+        Luna Maltseva
+      </a>
+
+      {!isMobile ? (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          {NAV_ITEMS.map((item) => {
+            if (item.dropdown) {
+              return <MCDropdown key={item.label} label={item.label} items={item.dropdown} isMobile={isMobile} />;
+            }
+            const Icon = item.href ? ICONS_BY_HREF[item.href] : undefined;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                style={{
+                  fontFamily: font,
+                  fontSize: '0.85rem',
+                  color: '#3d3028',
+                  opacity: 0.78,
+                  padding: '0.45rem 0.6rem',
+                  textDecoration: 'none',
+                  letterSpacing: '0.04em',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  transition: 'opacity 0.3s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                onMouseLeave={e => (e.currentTarget.style.opacity = '0.78')}
+              >
+                {Icon && <Icon size={14} style={{ color: '#8a7a6a' }} />}
+                <span>{item.label}</span>
+              </a>
+            );
+          })}
+        </div>
+      ) : (
+        <>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label="Toggle menu"
+            style={{ background: 'none', border: 'none', color: '#3d3028', padding: '0.35rem', cursor: 'pointer', display: 'flex', marginLeft: 'auto' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              {menuOpen ? (
+                <><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>
+              ) : (
+                <><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></>
+              )}
+            </svg>
+          </button>
+          {menuOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              background: 'rgba(250,248,245,0.97)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              borderBottom: '1px solid rgba(196,168,136,0.18)',
+              boxShadow: '0 8px 32px rgba(28,23,20,0.08)',
+              padding: '0.6rem 0',
+              zIndex: 1099,
+            }}>
+              {NAV_ITEMS.flatMap((item) => {
+                if (item.dropdown) {
+                  return [
+                    <div key={`cat-${item.label}`} style={{ padding: '0.7rem 1.25rem 0.3rem', fontFamily: mono, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#a89888' }}>{item.label}</div>,
+                    ...item.dropdown.map((sub) => {
+                      const Icon = ICONS_BY_HREF[sub.href];
+                      return (
+                        <a
+                          key={sub.href}
+                          href={sub.href}
+                          target={sub.external ? '_blank' : undefined}
+                          rel={sub.external ? 'noopener noreferrer' : undefined}
+                          onClick={() => setMenuOpen(false)}
+                          style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.55rem 1.25rem', color: '#3d3028', fontFamily: font, fontSize: '0.92rem', textDecoration: 'none' }}
+                        >
+                          {Icon && <Icon size={16} style={{ color: '#8a7a6a' }} />}
+                          <span>{sub.label}</span>
+                        </a>
+                      );
+                    }),
+                  ];
+                }
+                const Icon = item.href ? ICONS_BY_HREF[item.href] : undefined;
+                return [
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMenuOpen(false)}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.7rem 1.25rem', color: '#3d3028', fontFamily: font, fontSize: '0.95rem', textDecoration: 'none' }}
+                  >
+                    {Icon && <Icon size={16} style={{ color: '#8a7a6a' }} />}
+                    <span>{item.label}</span>
+                  </a>,
+                ];
+              })}
+            </div>
+          )}
+        </>
+      )}
+    </nav>
+  );
+}
+
 // ─── SETUP SCREEN ─────────────────────────────────────────────────────────────
 
 function SetupScreen({ onStart, isMobile }: {
@@ -718,7 +942,8 @@ function SetupScreen({ onStart, isMobile }: {
   };
 
   return (
-    <div style={{ backgroundColor: '#faf8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: isMobile ? '3rem 1.5rem' : '5rem', animation: 'mc-fadein 0.8s ease' }}>
+    <div style={{ backgroundColor: '#faf8f5', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: isMobile ? '5.5rem 1.5rem 3rem' : '6.5rem 5rem 3rem', animation: 'mc-fadein 0.8s ease' }}>
+      <MCNavbar isMobile={isMobile} />
       <div style={{ textAlign: 'center', marginBottom: isMobile ? '3rem' : '4rem' }}>
         <h1 style={{ fontFamily: font, fontSize: isMobile ? '3rem' : '4.5rem', fontWeight: 300, color: '#1c1714', letterSpacing: '-0.04em', lineHeight: 1.1, margin: 0 }}>
           Menstrual Clock
@@ -906,6 +1131,7 @@ export default function MenstrualClock() {
   if (!loaded) {
     return (
       <div style={{ backgroundColor: bg, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <MCNavbar isMobile={isMobile} />
         <div style={{ width: 60, height: 1, background: '#c4a882', animation: 'mc-pulse 2.5s ease-in-out infinite' }}/>
       </div>
     );
@@ -916,7 +1142,8 @@ export default function MenstrualClock() {
   }
 
   return (
-    <div style={{ backgroundColor: bg, minHeight: '100vh', opacity: clockVisible ? 1 : 0, transition: 'opacity 0.6s ease', boxSizing: 'border-box', padding: isMobile ? '3rem 1.5rem 3rem' : '4.5rem 5rem 3.5rem' }}>
+    <div style={{ backgroundColor: bg, minHeight: '100vh', opacity: clockVisible ? 1 : 0, transition: 'opacity 0.6s ease', boxSizing: 'border-box', padding: isMobile ? '5rem 1.5rem 3rem' : '6rem 5rem 3.5rem' }}>
+      <MCNavbar isMobile={isMobile} />
       {/* Sentence */}
       <div style={{ textAlign: 'center', marginBottom: isMobile ? '2.5rem' : '3.5rem' }}>
         <div style={{ fontFamily: font, fontSize: isMobile ? '1.1rem' : '1.35rem', color: '#1c1714', fontStyle: 'italic', fontWeight: 300, lineHeight: 2, letterSpacing: '0.01em', animation: 'mc-glow 7s ease-in-out infinite' }}>

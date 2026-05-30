@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { ICONS_BY_HREF } from './navIcons';
 
 interface NavLink {
   label: string;
@@ -35,6 +36,31 @@ const navItems: NavItem[] = [
   },
 ];
 
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        marginLeft: '0.35rem',
+        transition: 'transform 200ms ease',
+        transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        verticalAlign: 'middle',
+        flexShrink: 0,
+      }}
+      aria-hidden
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
 function Dropdown({ label, items, isMobile, onNavigate, rightAligned }: { label: string; items: NavLink[]; isMobile: boolean; onNavigate: () => void; rightAligned?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -44,19 +70,24 @@ function Dropdown({ label, items, isMobile, onNavigate, rightAligned }: { label:
         <span
           className="nav-link"
           onClick={() => setIsOpen(!isOpen)}
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
         >
           {label}
+          <Chevron open={isOpen} />
         </span>
         {isOpen && (
           <ul className="dropdown-menu" style={{ opacity: 1, visibility: 'visible', transform: 'none' }}>
-            {items.map((item) => (
-              <li key={item.href}>
-                <a href={item.href} className="dropdown-item" onClick={onNavigate}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            {items.map((item) => {
+              const Icon = ICONS_BY_HREF[item.href];
+              return (
+                <li key={item.href}>
+                  <a href={item.href} className="dropdown-item" onClick={onNavigate} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    {Icon && <Icon size={15} />}
+                    <span>{item.label}</span>
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         )}
       </li>
@@ -73,13 +104,17 @@ function Dropdown({ label, items, isMobile, onNavigate, rightAligned }: { label:
       <ul
         className={`dropdown-menu${rightAligned ? ' dropdown-menu-right' : ''} ${isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2.5'}`}
       >
-        {items.map((item) => (
-          <li key={item.href}>
-            <a href={item.href} className="dropdown-item">
-              {item.label}
-            </a>
-          </li>
-        ))}
+        {items.map((item) => {
+          const Icon = ICONS_BY_HREF[item.href];
+          return (
+            <li key={item.href}>
+              <a href={item.href} className="dropdown-item" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                {Icon && <Icon size={15} />}
+                <span>{item.label}</span>
+              </a>
+            </li>
+          );
+        })}
       </ul>
     </li>
   );
@@ -145,15 +180,22 @@ export default function Navbar() {
                 rightAligned={item.rightAligned}
               />
             ) : (
-              <li key={item.href} className="nav-item">
-                <a
-                  href={item.href}
-                  className="nav-link"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {item.label}
-                </a>
-              </li>
+              (() => {
+                const Icon = item.href ? ICONS_BY_HREF[item.href] : undefined;
+                return (
+                  <li key={item.href} className="nav-item">
+                    <a
+                      href={item.href}
+                      className="nav-link"
+                      onClick={() => setMenuOpen(false)}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}
+                    >
+                      {Icon && <Icon size={15} />}
+                      <span>{item.label}</span>
+                    </a>
+                  </li>
+                );
+              })()
             )
           )}
         </ul>
