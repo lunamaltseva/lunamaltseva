@@ -51,6 +51,7 @@ const sections: FavoriteSection[] = [
         excerpt: {
           before: 'Senza tema d’infamia ti rispondo.',
           highlight: [
+            ' ',
             'Let us go then, you and I,',
             'When the evening is spread out against the sky',
             'Like a patient etherized upon a table;',
@@ -64,6 +65,7 @@ const sections: FavoriteSection[] = [
             ' ',
             'Oh, do not ask, “What is it?”',
             'Let us go and make our visit.',
+            ' ',
           ],
           after: 'In the room the women come and go',
         },
@@ -80,6 +82,7 @@ const sections: FavoriteSection[] = [
         excerpt: {
           before: 'Into the artifice of eternity.',
           highlight: [
+            ' ',
             'IV',
             ' ',
             'Once out of nature I shall never take',
@@ -148,10 +151,12 @@ const sections: FavoriteSection[] = [
         excerpt: {
           before: 'И очарованную даль.',
           highlight: [
+            ' ',
             'Глухие тайны мне поручены,',
             'Мне чье-то солнце вручено,',
             'И все души моей излучины',
             'Пронзило терпкое вино.',
+            ' ',
             ],
           after: 'И перья страуса склоненные',
         },

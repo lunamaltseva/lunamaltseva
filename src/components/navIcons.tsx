@@ -1,3 +1,5 @@
+import type { ReactElement } from 'react';
+
 interface IconProps {
   size?: number;
   strokeWidth?: number;
@@ -122,7 +124,7 @@ export function IconFavorites(props: IconProps) {
 }
 
 // Map href → icon component for easy lookup by themed navbars.
-export const ICONS_BY_HREF: Record<string, (p: IconProps) => JSX.Element> = {
+export const ICONS_BY_HREF: Record<string, (p: IconProps) => ReactElement> = {
   '/about': IconAboutMe,
   '/writing/academic': IconAcademic,
   '/writing/fiction': IconFiction,
