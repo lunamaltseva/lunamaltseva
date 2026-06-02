@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useIsMobile } from '../hooks/useIsMobile';
 
 const TG_CHANNEL = 'lunamaltseva_blog';
-const TG_POST_IDS: number[] = [276, 274, 264, 257, 254, 253, 251, 244, 242, 240, 236, 221, 219, 215, 207, 200, 160, 154, 144, 128, 127, 113, 85, 77, 60, 26];
+const TG_POST_IDS: number[] = [279, 277, 276, 274, 264, 257, 254, 253, 251, 244, 242, 240, 236, 221, 219, 215, 207, 200, 160, 154, 144, 128, 127, 113, 85, 77, 60, 26];
 
 const IG_ACCOUNTS = ['lunamaltseva', 'rtms.ce', 'thezeraine'] as const;
 const IG_POSTS: { account: typeof IG_ACCOUNTS[number]; shortcode: string }[] = [

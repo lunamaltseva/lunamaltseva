@@ -10,8 +10,32 @@ export default function BreakingNews() {
       minHeight: 'calc(100vh - 150px)',
       color: '#ffffff',
       fontFamily: 'Georgia, "Times New Roman", Times, serif',
-      padding: '2rem 0 4rem',
+      padding: '0 0 4rem',
     }}>
+      {/* AI-generated disclaimer */}
+      <div style={{
+        position: 'sticky',
+        top: '60px',
+        zIndex: 20,
+        backgroundColor: '#c0211e',
+        color: '#ffffff',
+        fontFamily: '"Helvetica Neue", Arial, sans-serif',
+        fontSize: isMobile ? '0.72rem' : '0.8rem',
+        lineHeight: 1.5,
+        textAlign: 'center',
+        padding: `0.6rem ${px}`,
+      }}>
+        The text and content of this article are AI-generated for a bonus assignment.{' '}
+        <a
+          href="https://github.com/lunamaltseva/architification"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#ffffff', textDecoration: 'underline', fontWeight: 700 }}
+        >
+          View the project on GitHub
+        </a>
+      </div>
+
       {/* Masthead */}
       <div style={{
         borderTop: '3px solid #ffffff',
@@ -22,6 +46,7 @@ export default function BreakingNews() {
         alignItems: 'center',
         maxWidth: '960px',
         margin: '0 auto',
+        marginTop: '2rem',
         flexWrap: 'wrap',
         gap: '0.5rem',
       }}>

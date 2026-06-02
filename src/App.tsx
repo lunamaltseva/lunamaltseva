@@ -7,6 +7,7 @@ import Fiction from './pages/Fiction';
 import Academic from './pages/Academic';
 import About from './pages/About';
 import Design from './pages/Design';
+import Favorites from './pages/Favorites';
 import Redirect from './pages/r';
 import MenstrualClock from './pages/MenstrualClock';
 import BreakingNews from './pages/BreakingNews';
@@ -34,6 +35,7 @@ function App() {
             <Route path="/writing/fiction" element={<Fiction />} />
             <Route path="/writing/academic" element={<Academic />} />
             <Route path="/design" element={<Design />} />
+            <Route path="/favorites" element={<Favorites />} />
             <Route path="/r" element={<Redirect />} />
             <Route path="/decay" element={<Suspense fallback={<div style={{ background: '#000', minHeight: '100vh' }} />}><Decay /></Suspense>} />
             <Route path="/breakingnews" element={<BreakingNews />} />

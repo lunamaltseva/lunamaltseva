@@ -30,4 +30,5 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'Breaking News', href: '/breakingnews' },
     ],
   },
+  { label: 'Favorites', href: '/favorites' },
 ];

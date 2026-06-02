@@ -34,6 +34,7 @@ const navItems: NavItem[] = [
       { label: 'Breaking News', href: '/breakingnews' },
     ],
   },
+  { label: 'Favorites', href: '/favorites' },
 ];
 
 function Chevron({ open }: { open: boolean }) {
