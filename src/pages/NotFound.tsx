@@ -15,7 +15,7 @@ export default function NotFound() {
       textAlign: 'center',
     }}>
       <h1 style={{
-        fontFamily: 'CustomTitle, sans-serif',
+        fontFamily: 'var(--font-title)',
         fontSize: isMobile ? '4rem' : '6rem',
         color: '#ffffff',
         margin: '0 0 1rem 0',
@@ -24,7 +24,7 @@ export default function NotFound() {
         404
       </h1>
       <p style={{
-        fontFamily: 'CustomRegular, sans-serif',
+        fontFamily: 'var(--font-primary)',
         fontSize: isMobile ? '1rem' : '1.15rem',
         color: '#d4d0c8',
         margin: '0 0 2rem 0',
@@ -36,7 +36,7 @@ export default function NotFound() {
       <a
         href="/"
         style={{
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           color: '#ffffff',
           fontSize: '0.95rem',
           padding: '0.6rem 1.25rem',

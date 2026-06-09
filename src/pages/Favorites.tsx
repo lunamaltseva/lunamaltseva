@@ -426,7 +426,7 @@ function EntryAccordion({ entry, defaultOpen, isMobile }: {
       >
         <span style={{
           color: '#666',
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '1rem' : '1.15rem',
           minWidth: '1.5rem',
         }}>
@@ -435,7 +435,7 @@ function EntryAccordion({ entry, defaultOpen, isMobile }: {
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{
             display: 'block',
-            fontFamily: 'CustomRegularBold, sans-serif',
+            fontFamily: 'var(--font-primary)',
             fontSize: isMobile ? '0.95rem' : '1.05rem',
             color: '#eee',
           }}>
@@ -515,7 +515,7 @@ function Catalog({ isMobile }: { isMobile: boolean }) {
             backgroundColor: '#121212',
             color: '#ddd',
             fontSize: '0.9rem',
-            fontFamily: 'CustomRegularBold, sans-serif',
+            fontFamily: 'var(--font-primary)',
             textDecoration: 'none',
             transition: 'all 0.2s ease',
           }}
@@ -541,7 +541,7 @@ export default function Favorites() {
     }}>
       <div style={{ maxWidth: '820px', margin: '0 auto' }}>
         <h1 style={{
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '2rem' : '2.5rem',
           color: '#ffffff',
           margin: '0 0 0.5rem 0',
@@ -571,7 +571,7 @@ export default function Favorites() {
               marginBottom: '0.25rem',
             }}>
               <h2 style={{
-                fontFamily: 'CustomRegularBold, sans-serif',
+                fontFamily: 'var(--font-primary)',
                 fontSize: isMobile ? '1.3rem' : '1.5rem',
                 color: '#ffffff',
                 margin: 0,

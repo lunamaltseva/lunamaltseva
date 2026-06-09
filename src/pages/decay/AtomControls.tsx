@@ -191,7 +191,7 @@ export default function AtomControls({
                 ? 'rgba(255,255,255,0.07)'
                 : 'transparent',
               color: currentIsotope?.id === iso.id ? '#fff' : '#c8c4bc',
-              fontFamily: 'CustomRegular, sans-serif',
+              fontFamily: 'var(--font-primary)',
               fontSize: '0.75rem',
               cursor: isAnimating ? 'not-allowed' : 'pointer',
               opacity: isAnimating ? 0.4 : 1,
@@ -244,7 +244,7 @@ export default function AtomControls({
                   : disabled
                     ? '#555'
                     : '#c8c4bc',
-                fontFamily: 'CustomRegular, sans-serif',
+                fontFamily: 'var(--font-primary)',
                 fontSize: '0.8rem',
                 cursor: disabled && !isActive ? 'not-allowed' : 'pointer',
                 transition: 'color 0.2s ease, background-color 0.2s ease',
@@ -283,7 +283,7 @@ export default function AtomControls({
       {/* Temperature */}
       <div style={{ marginBottom: '16px' }}>
         <div style={{
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: '0.75rem',
           color: '#888',
           marginBottom: '6px',
@@ -314,7 +314,7 @@ export default function AtomControls({
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: '0.6rem',
           color: '#555',
           marginTop: '4px',
@@ -336,7 +336,7 @@ export default function AtomControls({
             borderRadius: '0.375rem',
             background: 'none',
             color: isAnimating ? '#555' : '#c8c4bc',
-            fontFamily: 'CustomRegular, sans-serif',
+            fontFamily: 'var(--font-primary)',
             fontSize: '0.8rem',
             cursor: isAnimating ? 'not-allowed' : 'pointer',
             transition: 'opacity 0.2s ease',

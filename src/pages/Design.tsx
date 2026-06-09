@@ -165,7 +165,7 @@ function ItemCard({ item, onClick, highlighted, isMobile }: {
           <span style={{
             color: highlighted ? '#fff' : '#ddd',
             fontSize: isMobile ? '0.9rem' : '0.95rem',
-            fontFamily: 'CustomRegularBold, sans-serif',
+            fontFamily: 'var(--font-primary)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -283,7 +283,7 @@ function ItemModal({ item, onClose, isMobile }: { item: DesignItem; onClose: () 
           )}
 
           <h2 style={{
-            fontFamily: 'CustomRegularBold, sans-serif',
+            fontFamily: 'var(--font-primary)',
             fontSize: isMobile ? '1.1rem' : '1.3rem',
             color: '#ffffff',
             margin: '1.5rem 0 0.5rem 0',
@@ -325,7 +325,7 @@ function SectionBlock({ section, id, onItemClick, isMobile }: {
         gap: '0.5rem',
       }}>
         <h2 style={{
-          fontFamily: 'CustomRegularBold, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: isMobile ? '1.1rem' : '1.3rem',
           color: '#ffffff',
           margin: 0,
@@ -335,7 +335,7 @@ function SectionBlock({ section, id, onItemClick, isMobile }: {
         <span style={{
           color: '#666',
           fontSize: '0.85rem',
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           flexShrink: 0,
         }}>
           {section.date}
@@ -374,7 +374,7 @@ export default function Design() {
     }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <h1 style={{
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '2rem' : '2.5rem',
           color: '#ffffff',
           margin: '0 0 0.5rem 0',

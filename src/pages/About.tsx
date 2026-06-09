@@ -152,7 +152,7 @@ export default function About() {
 
       <header style={{ position: 'relative', zIndex: 1 }}>
         <h1 style={{
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '2rem' : '2.5rem',
           color: '#ffffff',
           margin: 0,
@@ -161,7 +161,7 @@ export default function About() {
         </h1>
         <div style={{ marginTop: '1.25rem' }}>
           <p style={{
-            fontFamily: 'CustomRegular, sans-serif',
+            fontFamily: 'var(--font-primary)',
             fontSize: '1rem',
             color: '#d4d0c8',
             lineHeight: '1.6',
@@ -251,7 +251,7 @@ function CaughtUp() {
       <div
         className="caught-up-text"
         style={{
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: '1.5rem',
           color: '#c8c4bc',
           opacity: shown ? undefined : 0,
@@ -272,7 +272,7 @@ function SkillBubble({ skill }: { skill: string }) {
       padding: '0.35rem 0.75rem',
       borderRadius: '9999px',
       fontSize: '0.72rem',
-      fontFamily: 'CustomRegular, sans-serif',
+      fontFamily: 'var(--font-primary)',
       border: '1px solid rgba(255,255,255,0.08)',
       whiteSpace: 'nowrap',
     }}>
@@ -299,7 +299,7 @@ function SkillGroup({ category, items }: { category: string; items: string[] }) 
       <span
         onClick={() => hasOverflow && setExpanded((v) => !v)}
         style={{
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: '0.7rem',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
@@ -327,7 +327,7 @@ function SkillGroup({ category, items }: { category: string; items: string[] }) 
             borderRadius: '9999px',
             fontSize: '0.8rem',
             lineHeight: 1,
-            fontFamily: 'CustomRegular, sans-serif',
+            fontFamily: 'var(--font-primary)',
             border: '1px solid rgba(255,255,255,0.08)',
             whiteSpace: 'nowrap',
             cursor: 'pointer',

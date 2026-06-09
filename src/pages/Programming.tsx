@@ -56,7 +56,7 @@ const projects: Project[] = [
     id: 'rockstar-advanced',
     title: 'Rockstar',
     titleType: 'text',
-    titleFont: 'CustomTitle, sans-serif',
+    titleFont: 'var(--font-title)',
     description: 'A graphics application built with C++ featuring custom rendering, track design, and asset management. Utilizes raylib for graphics rendering and vcpkg for dependency management.',
     date: '2025',
     language: 'C++',
@@ -67,7 +67,7 @@ const projects: Project[] = [
     id: 'platformer-level-editor',
     title: 'Platformer Level Editor',
     titleType: 'text',
-    titleFont: 'CustomTitle, sans-serif',
+    titleFont: 'var(--font-title)',
     titleSize: '2.5rem',
     description: 'An interactive level editor for a platformer game built with Qt6 framework. Features grid-based editing with sprite tile placement, drag-placing, undo functionality, multi-level handling, and export to RLE-encoded level files.',
     date: '2025',
@@ -172,7 +172,7 @@ function ProjectNavbar({
                 border: 'none',
                 backgroundColor: index === activeIndex ? '#333' : 'transparent',
                 color: index === activeIndex ? '#fff' : '#888',
-                fontFamily: 'CustomRegular, sans-serif',
+                fontFamily: 'var(--font-primary)',
                 fontSize: isMobile ? '0.75rem' : '0.85rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
@@ -293,7 +293,7 @@ function ProjectPage({ project, isMobile }: { project: Project; isMobile: boolea
           />
         ) : (
           <h1 style={{
-            fontFamily: project.titleFont || 'CustomTitle, sans-serif',
+            fontFamily: project.titleFont || 'var(--font-title)',
             fontSize: isMobile ? '2rem' : (project.titleSize || '3.5rem'),
             color: '#ffffff',
             marginBottom: '1.5rem',

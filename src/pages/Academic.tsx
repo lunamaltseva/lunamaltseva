@@ -233,7 +233,7 @@ function FeaturedBadge({ venue }: { venue: string }) {
         padding: '0.4rem 0.65rem',
         background: '#efbf04',
         color: '#0a0a0a',
-        fontFamily: 'CustomRegularBold, sans-serif',
+        fontFamily: 'var(--font-primary)',
         fontSize: '0.65rem',
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
@@ -317,7 +317,7 @@ function PaperWidget({
           background: '#0a0a0a',
           borderTop: '1px solid rgba(255,255,255,0.12)',
           color: '#f5f5f5',
-          fontFamily: 'CustomRegularBold, serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: '0.85rem',
           lineHeight: 1.3,
           display: 'flex',
@@ -371,7 +371,7 @@ function PaperWidget({
             }}
           >
             <div style={{
-              fontFamily: 'CustomRegularBold, serif',
+              fontFamily: 'var(--font-primary)',
               fontSize: '1.05rem',
               color: '#f5f5f5',
               lineHeight: 1.3,
@@ -385,7 +385,7 @@ function PaperWidget({
               flexWrap: 'wrap',
               color: '#888',
               fontSize: '0.72rem',
-              fontFamily: 'CustomRegular, sans-serif',
+              fontFamily: 'var(--font-primary)',
               letterSpacing: '0.04em',
             }}>
               <span>{item.language}</span>
@@ -397,7 +397,7 @@ function PaperWidget({
             <p style={{
               color: '#bbb',
               fontSize: '0.85rem',
-              fontFamily: 'CustomRegular, serif',
+              fontFamily: 'var(--font-primary)',
               margin: '0.3rem 0 0 0',
               lineHeight: 1.6,
             }}>
@@ -423,7 +423,7 @@ function PaperWidget({
                 gap: '0.45rem',
                 padding: '0.55rem 1rem',
                 fontSize: '0.8rem',
-                fontFamily: 'CustomRegularBold, sans-serif',
+                fontFamily: 'var(--font-primary)',
                 letterSpacing: '0.04em',
                 color: '#0a0a0a',
                 background: '#f5f5f5',
@@ -464,7 +464,7 @@ function Shelf({ section, expandedIds, toggleExpanded, isMobile }: {
         padding: '0 0.25rem',
       }}>
         <h2 style={{
-          fontFamily: 'CustomTitle, serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '1.4rem' : '1.7rem',
           color: '#f5f5f5',
           margin: 0,
@@ -474,7 +474,7 @@ function Shelf({ section, expandedIds, toggleExpanded, isMobile }: {
         <span style={{
           color: '#777',
           fontSize: '0.72rem',
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
         }}>
@@ -484,7 +484,7 @@ function Shelf({ section, expandedIds, toggleExpanded, isMobile }: {
       <p style={{
         color: '#888',
         fontSize: '0.88rem',
-        fontFamily: 'CustomRegular, serif',
+        fontFamily: 'var(--font-primary)',
         margin: '0 0 0.6rem 0.25rem',
       }}>
         {section.description}
@@ -546,7 +546,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
         marginBottom: '0.95rem',
       }}>
         <div style={{
-          fontFamily: 'CustomTitle, serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '0.95rem' : '1.05rem',
           letterSpacing: '0.24em',
           textTransform: 'uppercase',
@@ -555,7 +555,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
           The Catalogue
         </div>
         <div style={{
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: '0.7rem',
           color: '#777',
           letterSpacing: '0.12em',
@@ -586,7 +586,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
                 padding: '0.65rem 0.8rem',
                 cursor: 'pointer',
                 color: '#ddd',
-                fontFamily: 'CustomRegular, serif',
+                fontFamily: 'var(--font-primary)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.15rem',
@@ -602,7 +602,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
               }}
             >
               <span style={{
-                fontFamily: 'CustomRegularBold, serif',
+                fontFamily: 'var(--font-primary)',
                 fontSize: '0.9rem',
                 color: '#f5f5f5',
               }}>
@@ -645,7 +645,7 @@ export default function Academic() {
     }}>
       <header style={{ marginBottom: '2rem' }}>
         <h1 style={{
-          fontFamily: 'CustomTitle, serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '2rem' : '2.6rem',
           color: '#f5f5f5',
           margin: 0,
@@ -656,7 +656,7 @@ export default function Academic() {
           color: '#888',
           fontSize: isMobile ? '0.9rem' : '1rem',
           margin: '0.4rem 0 0 0',
-          fontFamily: 'CustomRegular, serif',
+          fontFamily: 'var(--font-primary)',
         }}>
           A curated list of my publications, research, essays, articles, &c.
         </p>

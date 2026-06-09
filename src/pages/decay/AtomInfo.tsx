@@ -35,7 +35,7 @@ function MicrowaveCounter({ startedAt }: { startedAt: number }) {
       }}
     >
       <div style={{
-        fontFamily: 'CustomRegular, sans-serif',
+        fontFamily: 'var(--font-primary)',
         fontSize: '0.65rem',
         color: '#888',
         marginBottom: '4px',
@@ -71,7 +71,7 @@ export default function AtomInfo({ isotope, isExcited, isMobile, microwaveStarte
           borderRadius: '0.75rem',
           padding: isMobile ? '12px 16px' : '16px 24px',
           color: '#888',
-          fontFamily: 'CustomRegular, sans-serif',
+          fontFamily: 'var(--font-primary)',
           fontSize: isMobile ? '0.85rem' : '0.95rem',
         }}
       >
@@ -96,13 +96,13 @@ export default function AtomInfo({ isotope, isExcited, isMobile, microwaveStarte
         borderRadius: '0.75rem',
         padding: isMobile ? '12px 16px' : '20px 28px',
         color: '#ffffff',
-        fontFamily: 'CustomRegular, sans-serif',
+        fontFamily: 'var(--font-primary)',
         minWidth: isMobile ? '140px' : '180px',
       }}
     >
       <div
         style={{
-          fontFamily: 'CustomTitle, sans-serif',
+          fontFamily: 'var(--font-title)',
           fontSize: isMobile ? '1.4rem' : '1.75rem',
           marginBottom: '6px',
           display: 'flex',
@@ -116,7 +116,7 @@ export default function AtomInfo({ isotope, isExcited, isMobile, microwaveStarte
             style={{
               fontSize: '0.7rem',
               color: '#d4d0c8',
-              fontFamily: 'CustomRegular, sans-serif',
+              fontFamily: 'var(--font-primary)',
               fontStyle: 'italic',
             }}
           >
