@@ -103,6 +103,7 @@ export default function AtomInfo({ isotope, isExcited, isMobile, microwaveStarte
       <div
         style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '1.4rem' : '1.75rem',
           marginBottom: '6px',
           display: 'flex',

@@ -153,6 +153,7 @@ export default function About() {
       <header style={{ position: 'relative', zIndex: 1 }}>
         <h1 style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '2rem' : '2.5rem',
           color: '#ffffff',
           margin: 0,
@@ -252,6 +253,7 @@ function CaughtUp() {
         className="caught-up-text"
         style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: '1.5rem',
           color: '#c8c4bc',
           opacity: shown ? undefined : 0,

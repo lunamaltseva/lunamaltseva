@@ -4,8 +4,8 @@ import { useIsMobile } from '../hooks/useIsMobile';
 
 const READING_RULES: { title: string; body: string }[] = [
   { title: 'Section, intermezzo, chapter, intermezzo, chapter...', body: 'Every section opens and closes with an intermezzo. Chapters always have intermezzoes between them.' },
-  { title: 'Sections', body: 'Every section has (n) chapters and (n+1) intermezzoes. Every section of the book switches the theme of intermezzoes. Every section has an odd number of chapters.' },
-  { title: 'Intermezzoes', body: 'All intermezzoes reference past events. Intermezzoes target >500 words. All intermezzoes in one section refer to a common theme. Intermezzoes connect chapters, with exception to the first and last intermezzoes of the section. The first intermezzo foreshadows the theme of the section. The final intermezzo reveals an event that happened shortly before or sometime after the events of the final chapter in the section.' },
+  { title: 'Sections', body: 'Every section has an odd number of chapters and even number of intermezzoes. The central subject of intermezzoes alter in every section.' },
+  { title: 'Intermezzoes', body: 'All intermezzoes reference past events. Intermezzoes target <500 words. Intermezzoes connect chapters, with exception to the first and the last intermezzo of a section. The first intermezzo foreshadows the premise of the section. The final intermezzo reveals an event that happened sometime after the final chapter in that section.' },
   { title: 'Chapters', body: 'Every chapter must start and finish with the same character. Every chapter must feature the starting character for longer than any other character. Every chapter targets around 8\'000-10\'000 words.' },
   { title: 'Once published, never overwritten', body: 'Once the story of a chapter or an intermezzo has been published, it cannot be changed. The last published chapter and intermezzo can receive one half-time revision, but that revision cannot change core events.' },
 ];

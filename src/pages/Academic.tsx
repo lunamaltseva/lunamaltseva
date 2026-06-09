@@ -234,6 +234,7 @@ function FeaturedBadge({ venue }: { venue: string }) {
         background: '#efbf04',
         color: '#0a0a0a',
         fontFamily: 'var(--font-primary)',
+        fontWeight: 700,
         fontSize: '0.65rem',
         letterSpacing: '0.12em',
         textTransform: 'uppercase',
@@ -318,6 +319,7 @@ function PaperWidget({
           borderTop: '1px solid rgba(255,255,255,0.12)',
           color: '#f5f5f5',
           fontFamily: 'var(--font-primary)',
+          fontWeight: 700,
           fontSize: '0.85rem',
           lineHeight: 1.3,
           display: 'flex',
@@ -372,6 +374,7 @@ function PaperWidget({
           >
             <div style={{
               fontFamily: 'var(--font-primary)',
+              fontWeight: 700,
               fontSize: '1.05rem',
               color: '#f5f5f5',
               lineHeight: 1.3,
@@ -424,6 +427,7 @@ function PaperWidget({
                 padding: '0.55rem 1rem',
                 fontSize: '0.8rem',
                 fontFamily: 'var(--font-primary)',
+                fontWeight: 700,
                 letterSpacing: '0.04em',
                 color: '#0a0a0a',
                 background: '#f5f5f5',
@@ -465,6 +469,7 @@ function Shelf({ section, expandedIds, toggleExpanded, isMobile }: {
       }}>
         <h2 style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '1.4rem' : '1.7rem',
           color: '#f5f5f5',
           margin: 0,
@@ -547,6 +552,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
       }}>
         <div style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '0.95rem' : '1.05rem',
           letterSpacing: '0.24em',
           textTransform: 'uppercase',
@@ -603,6 +609,7 @@ function Catalogue({ isMobile, onJump }: { isMobile: boolean; onJump: (id: strin
             >
               <span style={{
                 fontFamily: 'var(--font-primary)',
+                fontWeight: 700,
                 fontSize: '0.9rem',
                 color: '#f5f5f5',
               }}>
@@ -646,6 +653,7 @@ export default function Academic() {
       <header style={{ marginBottom: '2rem' }}>
         <h1 style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '2rem' : '2.6rem',
           color: '#f5f5f5',
           margin: 0,

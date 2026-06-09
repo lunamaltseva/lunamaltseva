@@ -166,6 +166,7 @@ function ItemCard({ item, onClick, highlighted, isMobile }: {
             color: highlighted ? '#fff' : '#ddd',
             fontSize: isMobile ? '0.9rem' : '0.95rem',
             fontFamily: 'var(--font-primary)',
+            fontWeight: 700,
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -284,6 +285,7 @@ function ItemModal({ item, onClose, isMobile }: { item: DesignItem; onClose: () 
 
           <h2 style={{
             fontFamily: 'var(--font-primary)',
+            fontWeight: 700,
             fontSize: isMobile ? '1.1rem' : '1.3rem',
             color: '#ffffff',
             margin: '1.5rem 0 0.5rem 0',
@@ -326,6 +328,7 @@ function SectionBlock({ section, id, onItemClick, isMobile }: {
       }}>
         <h2 style={{
           fontFamily: 'var(--font-primary)',
+          fontWeight: 700,
           fontSize: isMobile ? '1.1rem' : '1.3rem',
           color: '#ffffff',
           margin: 0,
@@ -375,6 +378,7 @@ export default function Design() {
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <h1 style={{
           fontFamily: 'var(--font-title)',
+          fontWeight: 700,
           fontSize: isMobile ? '2rem' : '2.5rem',
           color: '#ffffff',
           margin: '0 0 0.5rem 0',

@@ -16,6 +16,7 @@ export default function NotFound() {
     }}>
       <h1 style={{
         fontFamily: 'var(--font-title)',
+        fontWeight: 700,
         fontSize: isMobile ? '4rem' : '6rem',
         color: '#ffffff',
         margin: '0 0 1rem 0',
