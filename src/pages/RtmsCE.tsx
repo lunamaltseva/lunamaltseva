@@ -756,9 +756,9 @@ function BrowserMockup({ scale = 1 }: { scale?: number }) {
 
 // ── FAQ ───────────────────────────────────────────────────────────────────────
 const FAQ_ITEMS = [
-  { q: 'But what is Artemis CE?', a: 'A Real-Time Management System for Civic Engagement (or aRTMSCE) is a set of approaches, policies, schemes, designs, and tools, and the logic that connects them. All elements of the system were tailored specifically for managing and analyzing Civic Engagement projects in order to support them with statistics.' },
-  { q: 'Why focus on data?', a: 'Data allows us to make statements with certainty. If we reach a surprising conclusion, we can verify it with data.' },
-  { q: 'If I don\'t study at AUCA, can I still use Artemis CE?', a: 'Absolutely! While the full toolset might not be available, we do have public resources (and are in the process of creating more!) to aid student leaders in collecting and analyzing quality data in order to continue their project!' },
+  { q: 'What actually is Artemis CE?', a: 'A Real-Time Management System for Civic Engagement (or aRTMSCE) is a data-oriented grant management system defined by a set of approaches, policies, schemes, designs, and tools. All elements of the system were tailored specifically for managing and analyzing Civic Engagement projects in order to support them with statistics.' },
+  { q: 'Why be "data-oriented"?', a: 'With data, we can better understand the impact that we are making. Data allows us to make statements with certainty. If we reach a surprising conclusion, we can back it with data.' },
+  { q: 'If I don\'t study at AUCA, can I still use Artemis CE?', a: 'Absolutely! While the full toolset might not be available, we do have public resources (like our toolset repository!) to aid student leaders in collecting and analyzing quality data in order to continue their project!' },
   { q: 'If I want to implement Artemis CE at my home institution, how do I do that?', a: 'Reach out to Luna, preferably in person. We are always looking for new partners to expand this project!'},
 ];
 
@@ -792,12 +792,12 @@ const FEATURES = [
   {
     // Database / real-time sync
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v4c0 1.66 4.03 3 9 3s9-1.34 9-3V5" /><path d="M3 9v4c0 1.66 4.03 3 9 3s9-1.34 9-3V9" /><path d="M3 13v4c0 1.66 4.03 3 9 3s9-1.34 9-3v-4" /></svg>,
-    title: 'Real-Time', desc: 'The system is accessible from any platform, at all times, and is centrally synchronized',
+    title: 'Real-Time', desc: 'The system is accessible on any platform and at all times',
   },
   {
     // Pie chart
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}><path d="M21.21 15.89A10 10 0 1 1 8 2.83" /><path d="M22 12A10 10 0 0 0 12 2v10z" /></svg>,
-    title: 'Auto-Inferential', desc: 'Artemis CE performs a set of pre-made algorithmic analyses on any timeframe, taking care to clearly communicate results',
+    title: 'Auto-Inferential', desc: 'Artemis CE performs a set of pre-made algorithmic analyses on any timeframe',
   },
   {
     // Laptop
@@ -817,7 +817,7 @@ const FEATURES = [
   {
     // Rising line graph
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" /></svg>,
-    title: '≥30% Improvement', desc: 'The system observed a consistent ≥30% improvement across all Key Performance Indicators',
+    title: '≥30% Improvement', desc: 'The system observed a consistent 30+% improvement across all Key Performance Indicators',
   },
 ];
 
@@ -866,8 +866,7 @@ export default function RtmsCE() {
           {/* ── Paragraph 1 ────────────────────────────────────────────────── */}
           <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: B.gray700, margin: '0 0 4rem' }}>
             Civic engagement is traditionally a narrative-based field, full of rich stories. 
-            Yet, the world is becoming more and more data-oriented by the day.
-            If only there existed a project which would combine the two...
+            The world, on the other hand, is becoming more and more data-oriented by the day.
           </p>
 
           {/* ── Intro heading ─────────────────────────────────────────────── */}
@@ -880,7 +879,7 @@ export default function RtmsCE() {
             letterSpacing: '-0.02em',
             lineHeight: 1.2,
           }}>
-            Introducing Artemis CE
+            Introducing RTMS CE
           </p>
 
           {/* ── Browser mockup ────────────────────────────────────────────── */}
@@ -890,9 +889,9 @@ export default function RtmsCE() {
 
           {/* ── Paragraph 2 ───────────────────────────────────────────────── */}
           <p style={{ fontSize: '1.05rem', lineHeight: 1.8, color: B.gray700, margin: '0 0 4rem' }}>
-            Artemis CE is a digital data-oriented grant management system, combining narratives with data to enable inferential decision making.
-            Having spent nineteen months in development, it is built on the industry's best practices of grant management and data collection.
-            It has been refined to prioritize ease of use, and has been deployed for two semesters at the AUCA Center for Civic Engagement.
+            Artemis CE is a digital, data-oriented grant management system, combining narratives with data to enable inferential decision making.
+            It has been in development for over nineteen months, and has been built to directly enhance the capabilities of civic engagement projects at no additional cost.
+            It has been deployed for 2 semesters at the AUCA Center for Civic Engagement.
             The system aims to have a full launch on React + Postgres in February of 2027.
           </p>
           
@@ -914,7 +913,7 @@ export default function RtmsCE() {
             <div style={{ marginBottom: '2rem' }}>
               <div style={{ ...eyebrow, color: SCARLET, marginBottom: 8 }}>Features</div>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: B.gray900, margin: '0 0 0.5rem', letterSpacing: '-0.01em' }}>
-                Artemis CE's Core Features
+                RTMS CE's Core Features
               </h2>
               <p style={{ fontSize: '0.95rem', color: B.gray500, margin: 0 }}>
                 The system was designed to stack "wins" on all sides.
@@ -968,10 +967,10 @@ export default function RtmsCE() {
           }}>
             <div style={{ ...eyebrow, color: SCARLET, marginBottom: 10 }}>Contact</div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: B.gray900, margin: '0 0 0.5rem', letterSpacing: '-0.01em' }}>
-              We would love to collaborate with you!
+              We would love to work with you!
             </h2>
             <p style={{ fontSize: '0.95rem', color: B.gray600, margin: '0 0 1.75rem', lineHeight: 1.7 }}>
-              Do not hesitate to reach out: that's what Get Engaged 2026 is for!
+              Do not hesitate to reach out: that's what Get Engaged is for!
             </p>
             <div style={{ display: 'flex', gap: '0.875rem', flexWrap: 'wrap' }}>
               <a href="mailto:luna@lunamaltseva.dev" style={{
@@ -1010,6 +1009,57 @@ export default function RtmsCE() {
               </a>
             </div>
           </div>
+
+          {/* ── Toolkit repository ─────────────────────────────────────────── */}
+          <section style={{
+            ...card,
+            padding: isMobile ? '1.5rem 1.25rem' : '2rem 2.25rem',
+            marginBottom: '2rem',
+          }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              justifyContent: 'space-between',
+              gap: isMobile ? '1.25rem' : '2rem',
+            }}>
+              <div>
+                <div style={{ ...eyebrow, color: SCARLET, marginBottom: 10 }}>Also see</div>
+                <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: B.gray900, margin: '0 0 0.5rem', letterSpacing: '-0.01em' }}>
+                  Artemis CE Data Science Toolkit
+                </h2>
+                <p style={{ fontSize: '0.95rem', color: B.gray600, margin: 0, lineHeight: 1.7 }}>
+                  This is a public repository for student leaders in the area of civic engagement to perform data analysis on field data.
+                </p>
+              </div>
+              <a
+                href="https://github.com/lunamaltseva/RTMSCE-DataScience-Toolkit"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: SCARLET,
+                  color: '#fff',
+                  padding: '0.65rem 1.2rem',
+                  borderRadius: 7,
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  textDecoration: 'none',
+                  transition: 'background 150ms ease',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = SCARLET2)}
+                onMouseLeave={e => (e.currentTarget.style.background = SCARLET)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}>
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                </svg>
+                View on GitHub
+              </a>
+            </div>
+          </section>
 
         </div>
       </div>
