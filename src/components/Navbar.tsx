@@ -132,7 +132,7 @@ export default function Navbar() {
 
   const title = (
     <a href="/" className="navbar-title">
-      L. A. Feverenn
+      La Feverenn
     </a>
   );
 

@@ -1,47 +1,27 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { ReactNode, CSSProperties } from 'react';
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   What's Wrong With THAT Graph!?  —  a presenter-driven circus gameshow.
-   Desktop only.
-
-   Flow:  title (curtains + orbiting spotlights → animated reveal) → teams →
-   rules → [round 1..5: question → reflection] → winner.
-   Teams: Team 1 = names A–K, Team 2 = names L–Z. Scores tracked here; the
-   presenter decides who buzzed and whether the answer is accepted.
-   Points: rounds 1&2 → 1, rounds 3&4 → 2, round 5 → 3.
-   Timer: 35s per round (round 5 has no timer). Blue marquee lamps start full at
-   12 o'clock and go dark clockwise as the clock runs down.
-
-   Fonts: the playful Fascinate Inline face is used ONLY for the reveal title on
-   the second screen; everything else is Open Sans.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-const TITLE = "'Fascinate Inline', 'Bungee', system-ui, cursive"; // reveal title only
+const TITLE = "'Fascinate Inline', 'Bungee', system-ui, cursive"; 
 const SANS = "'Open Sans', system-ui, sans-serif";
 
-const ROUND_TIME = 35; // seconds; round 5 runs untimed
+const ROUND_TIME = 35; 
 const POINTS_BY_ROUND = [1, 1, 2, 2, 3];
-const FINAL_ROUND = 4; // zero-based index of the fifth round
+const FINAL_ROUND = 4; 
 const FLAW_PROMPT = "What's Wrong with... This Graph?";
 
 const C = {
   white: '#ffffff',
-  blue: '#1f5fd0',       // titles + marquee lamps
+  blue: '#1f5fd0',       
   blueBright: '#4a8dff',
   curtain: '#1846b8',
   curtainDark: '#0e2f7a',
-  gray: '#333333',       // paragraph body copy
+  gray: '#333333',       
   faint: '#9fb2d8',
-  off: '#d1ddf2',        // unlit lamp
+  off: '#d1ddf2',        
   green: '#17a54a',
   red: '#e23b34',
 };
 
-/* ─────────────────────────────────────────────────────────────────────────
-   ROUND CONTENT.  A string graph is an image src; any other ReactNode renders
-   as-is; a missing value falls back to a labelled placeholder.
-   ───────────────────────────────────────────────────────────────────────── */
 interface RoundContent {
   tagline: string;
   explanation: string;
@@ -91,9 +71,6 @@ const PRELOAD_SRCS: string[] = ROUNDS.flatMap((r) =>
   [r.flawedGraph, r.betterGraph].filter((g): g is string => typeof g === 'string'),
 );
 
-// Title reveal timeline. Each brief number is HOW LONG that word's animation
-// takes; the words play one after another, so each start delay is the sum of
-// the previous durations.  "Graph!?" fully disappears at the end.
 const TITLE_WORDS = [
   { t: "What's", delay: 0.0,  dur: 0.5 },
   { t: 'Wrong',  delay: 0.5,  dur: 0.90 },
@@ -102,12 +79,9 @@ const TITLE_WORDS = [
 ];
 const GRAPH_DELAY = 2;
 const GRAPH_DUR = 1.5;
-const CURTAIN_MS = 1300; // must match the curtain slide transition
+const CURTAIN_MS = 1300;
 const TITLE_TIMELINE_MS = (GRAPH_DELAY + GRAPH_DUR) * 1000 + 150;
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Marquee light frame — blue lamps, small dots with a wide glow.
-   ───────────────────────────────────────────────────────────────────────── */
 type LightMode = 'idle' | 'countdown' | 'flash' | 'celebrate' | 'answering' | 'result';
 
 interface BulbPoint { x: number; y: number }
@@ -193,10 +167,6 @@ function LightFrame({
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Top bar (Open Sans): round · score · multiplier. On the final round it
-   collapses to a single label — no score, no multiplier.
-   ───────────────────────────────────────────────────────────────────────── */
 function TopBar({
   roundIdx, scores, points, answering, teamNames, isFinal,
 }: {
@@ -247,9 +217,6 @@ function TopBar({
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Graph rendering — square corners.
-   ───────────────────────────────────────────────────────────────────────── */
 function RoundGraph({
   graph, kind, round, maxHeight = '54vh',
 }: {
@@ -302,9 +269,6 @@ function GraphPlaceholder({ kind, round }: { kind: 'flawed' | 'better'; round: n
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Buttons — Open Sans, flat (no extrusion).
-   ───────────────────────────────────────────────────────────────────────── */
 function Btn({
   children, onClick, tone = 'blue', big, disabled, style,
 }: {
@@ -346,7 +310,6 @@ function Btn({
   );
 }
 
-// Small circular accept / reject button, floated right over the buzzing team.
 function CircleBtn({ tone, onClick, children }: { tone: 'green' | 'red'; onClick: () => void; children: ReactNode }) {
   const c = tone === 'green' ? C.green : C.red;
   return (
@@ -367,8 +330,6 @@ function CircleBtn({ tone, onClick, children }: { tone: 'green' | 'red'; onClick
   );
 }
 
-// Two buttons laid out so the SHARED EDGE between them sits at screen centre —
-// a longer label on one side never shifts the other.
 function EdgeDock({ left, right }: { left: ReactNode; right: ReactNode }) {
   return (
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', width: '100%', maxWidth: 940, margin: '0 auto', columnGap: '3rem', alignItems: 'end' }}>
@@ -378,7 +339,7 @@ function EdgeDock({ left, right }: { left: ReactNode; right: ReactNode }) {
   );
 }
 
-// Dark-gray body copy on white, left aligned, one line per sentence.
+
 function Paragraph({ text, style }: { text: string; style?: CSSProperties }) {
   const parts = text.match(/[^.]+\.?/g)?.map((s) => s.trim()).filter(Boolean) ?? [text];
   return (
@@ -390,9 +351,6 @@ function Paragraph({ text, style }: { text: string; style?: CSSProperties }) {
   );
 }
 
-/* ═════════════════════════════════════════════════════════════════════════
-   Main
-   ═════════════════════════════════════════════════════════════════════════ */
 type Phase = 'title' | 'teams' | 'rules' | 'question' | 'reflection' | 'winner';
 
 export default function Wwwtg() {
@@ -408,9 +366,9 @@ export default function Wwwtg() {
   const [compare, setCompare] = useState(false);
   const [teamNames, setTeamNames] = useState<Record<1 | 2, string>>({ 1: 'Team 1', 2: 'Team 2' });
   const [nextLocked, setNextLocked] = useState(false);
-  const [showStarted, setShowStarted] = useState(false); // curtains parting
-  const [revealed, setRevealed] = useState(false);        // curtains fully open → title animates
-  const [titleDone, setTitleDone] = useState(false);      // reveal finished, lamps ignite
+  const [showStarted, setShowStarted] = useState(false); 
+  const [revealed, setRevealed] = useState(false);        
+  const [titleDone, setTitleDone] = useState(false);      
   const timeupHandled = useRef(false);
 
   const points = POINTS_BY_ROUND[roundIdx];
@@ -426,7 +384,6 @@ export default function Wwwtg() {
     return () => clearInterval(id);
   }, []);
 
-  // The title animation only begins once the curtains have fully opened.
   useEffect(() => {
     if (!showStarted) return;
     const id = setTimeout(() => setRevealed(true), CURTAIN_MS);
@@ -443,7 +400,7 @@ export default function Wwwtg() {
     if (!timerRunning || timeLeft <= 0) return;
     const id = setInterval(() => setTimeLeft((t) => Math.max(0, +(t - 0.1).toFixed(2))), 100);
     return () => clearInterval(id);
-  }, [timerRunning, timeLeft <= 0]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [timerRunning, timeLeft <= 0]); 
 
   useEffect(() => {
     if (!nextLocked) return;
@@ -523,7 +480,7 @@ export default function Wwwtg() {
     zIndex: 10,
   };
 
-  // Column layout: optional top bar, centred body, buttons docked at the bottom.
+  
   const layout = (opts: { topBar?: ReactNode; body: ReactNode; dock?: ReactNode }) => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', minHeight: 0, gap: '1.25rem' }}>
       {opts.topBar}
@@ -534,7 +491,6 @@ export default function Wwwtg() {
     </div>
   );
 
-  /* ── title ── */
   const renderTitle = () => layout({
     body: (
       <div style={{ textAlign: 'center', maxWidth: 1150, margin: '0 auto' }}>
@@ -565,7 +521,6 @@ export default function Wwwtg() {
     dock: titleDone ? <Btn big onClick={() => setPhase('teams')}>Meet the Teams ▶</Btn> : undefined,
   });
 
-  /* ── teams ── */
   const renderTeams = () => {
     const letterTile = (ch: string) => (
       <span key={ch} style={{
@@ -615,7 +570,6 @@ export default function Wwwtg() {
     });
   };
 
-  /* ── rules ── */
   const renderRules = () => layout({
     body: (
       <div style={{ maxWidth: '70vw', width: '100%', margin: '0 auto', textAlign: 'center' }}>
@@ -629,7 +583,6 @@ export default function Wwwtg() {
     dock: <Btn onClick={() => goToRound(0)} big>LET'S PLAY ▶</Btn>,
   });
 
-  /* ── question ── */
   const renderQuestion = () => {
     const teamButton = (team: 1 | 2) => {
       const active = answering === team;
@@ -675,14 +628,12 @@ export default function Wwwtg() {
     });
   };
 
-  /* ── reflection ── */
   const renderReflection = () => layout({
     topBar: <TopBar roundIdx={roundIdx} scores={scores} points={points} answering={answering} teamNames={teamNames} isFinal={isFinalRound} />,
     body: (
       <div style={{ width: '100%', textAlign: 'center' }}>
         <h2 style={{ fontFamily: SANS, fontWeight: 800, color: C.blue, fontSize: '2.2rem', margin: '0 0 0.9rem' }}>{round.tagline}</h2>
         <Paragraph text={round.explanation} style={{ maxWidth: 760, margin: '0 auto 1.4rem' }} />
-        {/* Fixed-height stage so toggling compare never shifts the layout. */}
         <div style={{ height: '46vh', display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center' }}>
           {compare ? (
             <>
@@ -707,7 +658,6 @@ export default function Wwwtg() {
     ),
   });
 
-  /* ── winner ── */
   const renderWinner = () => {
     const winner = scores[1] === scores[2] ? 0 : scores[1] > scores[2] ? 1 : 2;
     return layout({
@@ -752,13 +702,13 @@ export default function Wwwtg() {
         @keyframes wwwtg-frame-in { from { opacity: 0; } to { opacity: 1; } }
         .wwwtg-bulb { transition: background 160ms ease, box-shadow 160ms ease; }
 
-        /* "What's Wrong with THAT" — each word expands from its centre. */
+        
         @keyframes wwwtg-word {
           0%   { opacity: 0; transform: scale(0); }
           70%  { opacity: 1; transform: scale(1.12); }
           100% { opacity: 1; transform: scale(1); }
         }
-        /* Spotlights wander the whole screen — independent x/y sweeps at
+        y sweeps at
            different periods trace a smooth screen-filling path. */
         @keyframes wwwtg-sweep-x { from { transform: translateX(-42vw); } to { transform: translateX(42vw); } }
         @keyframes wwwtg-sweep-y { from { transform: translateY(-40vh); } to { transform: translateY(40vh); } }
@@ -777,7 +727,6 @@ export default function Wwwtg() {
         {phase === 'winner' && renderWinner()}
       </div>
 
-      {/* ── Circus intro: hard-striped blue curtains + two orbiting white spotlights ── */}
       {phase === 'title' && (
         <>
           <div style={{
@@ -793,8 +742,6 @@ export default function Wwwtg() {
             transition: 'transform 1.3s cubic-bezier(.7,0,.3,1)',
           }} />
 
-          {/* Two spotlights that wander the whole screen: nested divs sweep the
-              x and y axes independently at different periods. */}
           {[
             { x: '7s', y: '5s', dx: '0s', dy: '-2s' },
             { x: '5s', y: '8s', dx: '-3s', dy: '-1s' },
@@ -814,7 +761,6 @@ export default function Wwwtg() {
             </div>
           ))}
 
-          {/* Whole screen is click-to-begin — no text. */}
           {!showStarted && (
             <div
               onClick={() => setShowStarted(true)}
@@ -824,7 +770,6 @@ export default function Wwwtg() {
         </>
       )}
 
-      {/* ── Difficulty-bump announcement (rounds 3 & 5), Open Sans ── */}
       {showAnnounce && phase === 'question' && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 20,

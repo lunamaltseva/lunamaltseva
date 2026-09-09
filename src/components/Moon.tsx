@@ -32,9 +32,9 @@ export default function Moon({ fraction, rotation, size = 480 }: MoonProps) {
     >
       <g transform={`rotate(${rotation})`}>
         {/* Unlit face: pitch black against the night sky. */}
-        <circle cx="0" cy="0" r={R} fill="#000000" />
+        <circle cx="0" cy="0" r={R} fill="#ffffff" />
         {/* Lit face: pure white. */}
-        <path d={litPath(fraction)} fill="#ffffff" />
+        <path d={litPath(fraction)} fill="#000000" />
       </g>
       {/* White outline tracing the full disk. */}
       <circle cx="0" cy="0" r={R} fill="none" stroke="#ffffff" strokeWidth="0.4" />
