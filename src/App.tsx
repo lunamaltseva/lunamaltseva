@@ -12,6 +12,7 @@ import MenstrualClock from './pages/MenstrualClock';
 import BreakingNews from './pages/BreakingNews';
 import RtmsCE from './pages/RtmsCE';
 import Wwwtg from './pages/Wwwtg';
+import Rockstar from './pages/Rockstar';
 import NotFound from './pages/NotFound';
 
 const Decay = lazy(() => import('./pages/Decay'));
@@ -22,6 +23,7 @@ function App() {
       <Route path="/menstrualclock" element={<MenstrualClock />} />
       <Route path="/rtmsce" element={<RtmsCE />} />
       <Route path="/wwwtg" element={<Wwwtg />} />
+      <Route path="/rockstar" element={<Rockstar />} />
       <Route path="*" element={
         <div className="app-wrapper">
           <Navbar />

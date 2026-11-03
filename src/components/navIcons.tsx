@@ -133,6 +133,19 @@ export function IconWwwtg(props: IconProps) {
   );
 }
 
+export function IconRockstar(props: IconProps) {
+  return (
+    <svg {...baseSvgProps(props)}>
+      <g transform="rotate(40 12 12)">
+        <path d="M10.8 13.6L8.3 10.4C7.2 11 6.8 12.6 7.4 14C5.8 15.2 5.7 18.2 7 20C8.7 22.6 15.3 22.6 17 20C18.3 18.2 18 15.6 16.6 14.6C17.2 13.6 16.9 12.4 16.1 11.9L13.2 13.6" />
+        <path d="M12 13.6V4.5" />
+        <path d="M10.7 4.5L11 1.2H13.5L13.3 4.5Z" />
+        <path d="M10.2 16.6h3.6M10.2 18.8h3.6" />
+      </g>
+    </svg>
+  );
+}
+
 // Map href → icon component for easy lookup by themed navbars.
 export const ICONS_BY_HREF: Record<string, (p: IconProps) => ReactElement> = {
   '/about': IconAboutMe,
@@ -145,5 +158,6 @@ export const ICONS_BY_HREF: Record<string, (p: IconProps) => ReactElement> = {
   '/decay': IconDecay,
   '/menstrualclock': IconMenstrualClock,
   '/breakingnews': IconBreakingNews,
+  '/rockstar': IconRockstar,
   '/favorites': IconFavorites,
 };

@@ -34,6 +34,7 @@ export const NAV_RIGHT: NavItem[] = [
       { label: 'Nuclear Decay Visualizer', href: '/decay' },
       { label: 'Menstrual Clock', href: '/menstrualclock' },
       { label: 'Breaking News', href: '/breakingnews' },
+      { label: 'Rockstar Level Composer', href: '/rockstar' },
     ],
   },
 ];

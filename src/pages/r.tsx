@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 export default function Redirect() {
   useEffect(() => {
-    window.location.replace('https://schedulewhen.net');
+    window.location.replace('https://canva.link/vft4hqfss4zhow2');
   }, []);
 
   return (
