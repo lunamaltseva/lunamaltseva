@@ -24,6 +24,7 @@ interface State {
   stageH: number; dragging: boolean; copied: boolean;
   reaction: number | null; reactDraft: string | null; editZ: number | null;
   box: Box | null; outOpen: boolean; picker: Picker | null; wantAudio: string | null;
+  speed: number; speedDraft: string | null;
 }
 
 const REACTION = 123;   // default reaction window, ms
@@ -151,6 +152,11 @@ const fieldInput: CSSProperties = {
   fontFamily: FONT, fontWeight: 700, fontSize: 14,
 };
 
+const numInput: CSSProperties = {
+  width: 42, padding: '2px 0', background: 'transparent', border: 'none', borderBottom: '1px solid #3a3a3a', outline: 'none',
+  color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: 13, textAlign: 'center',
+};
+
 const modeBtn = (active: boolean): CSSProperties => ({
   height: 30, padding: '0 18px', border: 'none',
   background: active ? 'linear-gradient(#555,#111)' : 'transparent', color: '#fff',
@@ -164,6 +170,7 @@ class Composer extends Component<object, State> {
     bpm: '', offset: '0', grid: '2', mode: 'keys', down: [0, 0, 0, 0], ctrlFlash: null,
     sels: [], stageH: 520, dragging: false, copied: false,
     reaction: null, reactDraft: null, editZ: null, box: null, outOpen: false, picker: null, wantAudio: null,
+    speed: 1, speedDraft: null,
   };
 
   lanesRef = createRef<HTMLDivElement>();
@@ -175,7 +182,7 @@ class Composer extends Component<object, State> {
   marqText = createRef<HTMLSpanElement>();
 
   nextId = 1; bubbleId = 1; bubblesArr: Bubble[] = [];
-  auto = [0, 0, 0, 0]; t0 = 0; lastCur = 0; now = 0; liveCur = 0; lastRender = 0; lastFrame = 0;
+  auto = [0, 0, 0, 0]; c0 = 0; p0 = 0; rate = 1; lastCur = 0; now = 0; liveCur = 0; lastRender = 0; lastFrame = 0;
   strs: Str[] = [0, 1, 2, 3].map(() => ({ off: 0, amp: 0, a: null, b: null, dirty: true }));
   strH = 0; strBy = 0;
   strRef: Record<string, (el: SVGPathElement | null) => void> = {};
@@ -213,12 +220,13 @@ class Composer extends Component<object, State> {
 
   componentDidMount() {
     this.audio = new Audio();
+    this.audio.preservesPitch = false;  // speed changes shift pitch, like a tape
     this.audio.addEventListener('ended', () => {
       if (this.state.phase === 'recording') this.stopRecording();
-      else if (this.state.playing) this.t0 = performance.now() - this.liveCur;
+      else if (this.state.playing) this.anchor(this.liveCur);
     });
     // Playback actually began: align the clock to the audio once, absorbing play() start latency.
-    this.audio.addEventListener('playing', () => { if (this.live()) this.t0 = performance.now() - (this.audio.currentTime * 1000 - this.off()); });
+    this.audio.addEventListener('playing', () => { if (this.live()) this.anchor(this.audio.currentTime * 1000 - this.off()); });
     this.audio.addEventListener('loadedmetadata', () => this.setState({ audioDur: this.audio.duration * 1000 }));
     window.addEventListener('keydown', this.kd); window.addEventListener('keyup', this.ku);
     this.attachStage();
@@ -256,8 +264,9 @@ class Composer extends Component<object, State> {
   editZ() { return this.state.editZ ?? this.baseZ(); }
   zoomV() { return this.state.phase === 'saving' ? this.editZ() : this.baseZ(); }
   clampZ(z: number) { return Math.min(3, Math.max(0.01, z)); }
-  // Frame ladder for the Reaction +/− buttons: 1f@240, 1f@120, then whole frames at 60 FPS up to 2 s.
-  reactLadder() { return this.ladder || (this.ladder = [1000 / 240, 1000 / 120, ...Array.from({ length: 120 }, (_, i) => (i + 1) * 1000 / 60)]); }
+  // The game accepts a hit within ±Reaction, so the hit window is 2 × Reaction.
+  // Frame ladder for the Reaction +/− buttons, by window: 1f@240, 1f@120, then whole frames at 60 FPS up to 2 s.
+  reactLadder() { return this.ladder || (this.ladder = [1000 / 240, 1000 / 120, ...Array.from({ length: 120 }, (_, i) => (i + 1) * 1000 / 60)].map(w => w / 2)); }
   stepReaction(dir: number) {
     const r = this.reaction(), L = this.reactLadder(), eps = 1e-3;
     const v = dir < 0 ? [...L].reverse().find(x => x < r - eps) : L.find(x => x > r + eps);
@@ -265,13 +274,14 @@ class Composer extends Component<object, State> {
   }
   setReaction(v: number) {
     // Freeze the edit zoom first so changing Reaction doesn't rescale the edit view.
-    this.setState({ reaction: Math.min(2000, Math.max(4, v)), reactDraft: null, editZ: this.state.editZ ?? this.editZ() });
+    this.setState({ reaction: Math.min(2000, Math.max(2, v)), reactDraft: null, editZ: this.state.editZ ?? this.editZ() });
   }
+  // Hit window (2 × Reaction) in frames.
   frameLabel(r: number) {
-    const near = (a: number, b: number) => Math.abs(a - b) < 0.02;
-    if (near(r, 1000 / 240)) return '1-frame @ 240 FPS';
-    if (near(r, 1000 / 120)) return '1-frame @ 120 FPS';
-    const f = r * 60 / 1000, n = Math.max(1, Math.round(f));
+    const w = 2 * r, near = (a: number, b: number) => Math.abs(a - b) < 0.04;
+    if (near(w, 1000 / 240)) return '1-frame @ 240 FPS';
+    if (near(w, 1000 / 120)) return '1-frame @ 120 FPS';
+    const f = w * 60 / 1000, n = Math.max(1, Math.round(f));
     return (near(f * 1000 / 60, n * 1000 / 60) ? '' : '≈') + n + '-frame @ 60 FPS';
   }
   msLabel(r: number) { return String(Math.round(r * 100) / 100); }
@@ -317,21 +327,30 @@ class Composer extends Component<object, State> {
   // audio.currentTime only advances in coarse steps, so reading it directly makes
   // the lanes stutter. Run on the performance clock and steer it toward the audio:
   // ease out small drift, snap on real jumps (seeks, buffering stalls).
+  // Timeline time runs at `rate` × real time from the anchor.
   clock() {
     const now = performance.now();
     if (this.hasAudio() && !this.audio.paused && this.audio.currentTime > 0) {
-      const drift = (now - this.t0) - (this.audio.currentTime * 1000 - this.off());
-      if (Math.abs(drift) > 120) this.t0 += drift;
-      else this.t0 += drift * 0.05;
+      const drift = this.c0 + (now - this.p0) * this.rate - (this.audio.currentTime * 1000 - this.off());
+      if (Math.abs(drift) > 120) this.c0 -= drift;
+      else this.c0 -= drift * 0.05;
     }
-    return now - this.t0;
+    return this.c0 + (now - this.p0) * this.rate;
+  }
+  anchor(cur: number) { this.c0 = cur; this.p0 = performance.now(); }
+  setSpeed(v: number) {
+    v = Math.round(Math.min(2, Math.max(0.2, v)) * 100) / 100;
+    if (this.live()) this.anchor(this.clock());
+    this.rate = v; this.audio.playbackRate = v;
+    this.setState({ speed: v });
   }
   startAudio(cur: number) {
-    clearTimeout(this.audT); this.audio.pause(); this.t0 = performance.now() - cur;
+    clearTimeout(this.audT); this.audio.pause(); this.anchor(cur);
     if (!this.hasAudio()) return;
     const at = cur + this.off();
+    this.audio.playbackRate = this.rate;
     if (at >= 0) { this.audio.currentTime = at / 1000; this.audio.play(); }
-    else { this.audio.currentTime = 0; this.audT = window.setTimeout(() => this.audio.play(), -at); }
+    else { this.audio.currentTime = 0; this.audT = window.setTimeout(() => this.audio.play(), -at / this.rate); }
   }
   stopAudio() { clearTimeout(this.audT); this.audio?.pause(); }
   editable() { return this.state.phase === 'saving' && !this.state.playing; }
@@ -442,7 +461,7 @@ class Composer extends Component<object, State> {
     if (phase !== 'standby' && phase !== 'recording') return;
     this.hit(lane, false);
     if (phase === 'standby') {
-      this.t0 = performance.now(); this.lastCur = this.liveCur = 0;
+      this.anchor(0); this.lastCur = this.liveCur = 0;
       this.setState({ phase: 'recording', down, picks: [this.mk(lane, 0)], cur: 0 });
       return;
     }
@@ -489,7 +508,7 @@ class Composer extends Component<object, State> {
       const patch: Partial<State> = { phase: 'saving', picks: picks.sort((a, b) => a.t - b.t), cur: 0, playing: false, sels: [], outOpen: false };
       if (!isNaN(off)) patch.offset = String(off);
       if (!isNaN(bpm)) patch.bpm = String(bpm);
-      if (!isNaN(react) && react > 0) { patch.reaction = Math.min(2000, Math.max(4, react)); patch.reactDraft = null; patch.editZ = null; }
+      if (!isNaN(react) && react > 0) { patch.reaction = Math.min(2000, Math.max(2, react)); patch.reactDraft = null; patch.editZ = null; }
       const audio = txt.match(/\*\*Audio:\*\*\s*(.+?)\s*$/im)?.[1] ?? null;
       if (audio) {
         patch.mode = 'music';
@@ -599,6 +618,8 @@ class Composer extends Component<object, State> {
       case 'ArrowUp': case 'ArrowDown': case 'ArrowLeft': case 'ArrowRight':
         if (this.state.sels.length && this.editable()) { e.preventDefault(); this.nudge(e.code); }
         break;
+      case 'BracketLeft': this.setSpeed(this.rate - 0.1); break;
+      case 'BracketRight': this.setSpeed(this.rate + 0.1); break;
       case 'Equal': this.zoomBy(1.25); break;
       case 'Minus': this.zoomBy(0.8); break;
     }
@@ -904,14 +925,33 @@ class Composer extends Component<object, State> {
                 <span style={label}>Length</span><span style={value}>{lengthLabel}</span>
                 {isMusic && <><span style={label}>Audio</span><span style={value}>{s.audioDur ? this.clockFmt(s.audioDur) : '—'}</span></>}
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 13 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', justifyContent: 'start', alignItems: 'center', gap: '10px 18px', fontSize: 13 }}>
+                <span style={label}>Speed</span>
+                <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <StepButton onClick={() => this.setSpeed(this.rate + 0.1)} size={24}>+</StepButton>
+                  <span style={{ display: 'flex', alignItems: 'baseline', gap: 3, minWidth: 64, justifyContent: 'center' }}>
+                    <input
+                      className="lc-react" type="number" min={0.2} max={2} step={0.1} title="Playback speed; pitch follows. [ and ] adjust."
+                      value={s.speedDraft ?? s.speed.toFixed(Math.round(s.speed * 100) % 10 ? 2 : 1)}
+                      onChange={e => {
+                        this.setState({ speedDraft: e.target.value });
+                        const v = parseFloat(e.target.value);
+                        if (v >= 0.2 && v <= 2) this.setSpeed(v);
+                      }}
+                      onBlur={() => this.setState({ speedDraft: null })}
+                      onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') e.currentTarget.blur(); }}
+                      style={numInput}
+                    />
+                    <span style={value}>×</span>
+                  </span>
+                  <StepButton onClick={() => this.setSpeed(this.rate - 0.1)} size={24}>−</StepButton>
+                </span>
                 <span style={label}>Reaction</span>
                 <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <StepButton onClick={() => this.zoomBy(1.25)} size={24}>+</StepButton>
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 3, minWidth: 64, justifyContent: 'center' }}>
                     <input
-                      className="lc-react" type="number" min={4} max={2000} step="any"
+                      className="lc-react" type="number" min={2} max={2000} step="any"
                       value={s.reactDraft ?? this.msLabel(this.reaction())}
                       onChange={e => this.setState({ reactDraft: e.target.value })}
                       onBlur={() => this.commitReact()}
@@ -921,14 +961,13 @@ class Composer extends Component<object, State> {
                           e.currentTarget.blur();
                         }
                       }}
-                      style={{ width: 42, padding: '2px 0', background: 'transparent', border: 'none', borderBottom: '1px solid #3a3a3a', outline: 'none', color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: 13, textAlign: 'center' }}
+                      style={numInput}
                     />
                     <span style={value}>ms</span>
                   </span>
                   <StepButton onClick={() => this.zoomBy(0.8)} size={24}>−</StepButton>
                 </span>
-              </div>
-              <span title="Reaction window in frames at 60 FPS" style={{ fontSize: 11, fontWeight: 600, color: '#9a9a9a', whiteSpace: 'nowrap' }}>{this.frameLabel(this.reaction())}</span>
+                <span title="Hit window (2 × Reaction) in frames at 60 FPS" style={{ gridColumn: '1 / -1', marginTop: -6, fontSize: 11, fontWeight: 600, color: '#9a9a9a', whiteSpace: 'nowrap' }}>{this.frameLabel(this.reaction())}</span>
               </div>
             </div>
 
@@ -936,7 +975,7 @@ class Composer extends Component<object, State> {
               ref={this.lanesRef}
               onPointerDown={e => this.onStageDown(e)}
               onDoubleClick={e => this.onStageDbl(e)}
-              style={{ position: 'relative', flex: '0 0 344px', width: 344, minHeight: 420, background: '#070707', clipPath: 'inset(0 -64px)', cursor: ed ? 'crosshair' : 'default', touchAction: 'none', userSelect: 'none' }}
+              style={{ position: 'relative', flex: '0 0 344px', width: 344, minHeight: 420, background: '#070707', clipPath: 'inset(0 -64px)', overflowX: 'visible', overflowY: 'clip', cursor: ed ? 'crosshair' : 'default', touchAction: 'none', userSelect: 'none' }}
             >
               <div style={{ position: 'absolute', inset: 0, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', pointerEvents: 'none' }}>
                 <div style={{ borderRight: '1px solid #141414' }} />
