@@ -7,13 +7,14 @@ import { Component, createRef, memo, type CSSProperties, type ReactNode } from '
 type Phase = 'practice' | 'standby' | 'recording' | 'saving';
 type Mode = 'keys' | 'music';
 type KeyState = 'normal' | 'pressed' | 'blocked' | 'selected';
-type KeyIcon = 'none' | 'record' | 'save' | 'trash' | 'play' | 'pause' | 'restart';
-type Ctrl = 'R' | 'S' | 'D';
+type KeyIcon = 'none' | 'record' | 'save' | 'trash' | 'play' | 'pause' | 'restart' | 'import';
+type Ctrl = 'R' | 'S' | 'D' | 'I';
 
 interface Note { id: number; lane: number; t: number; raw: number }
 interface Box { x: number; y: number; w: number; h: number }
 interface Str { off: number; amp: number; a: SVGPathElement | null; b: SVGPathElement | null; dirty: boolean }
 interface Bubble { id: number; lane: number; born: number }
+interface Picker { x: number; y: number; t: number }
 
 interface State {
   phase: Phase; picks: Note[]; cur: number; playing: boolean;
@@ -21,8 +22,8 @@ interface State {
   bpm: string; offset: string; grid: string; mode: Mode;
   down: number[]; ctrlFlash: Ctrl | null; sels: number[];
   stageH: number; dragging: boolean; copied: boolean;
-  reaction: number | null; reactDraft: string | null; viewZoom: number;
-  box: Box | null; outOpen: boolean;
+  reaction: number | null; reactDraft: string | null; editZ: number | null;
+  box: Box | null; outOpen: boolean; picker: Picker | null; wantAudio: string | null;
 }
 
 const REACTION = 123;   // default reaction window, ms
@@ -81,6 +82,13 @@ const Keycap = memo(function Keycap({ label = '', state = 'normal', icon = 'none
           {[0, 1, 2].map(i => <span key={i} style={{ width: '4cqw', height: '20cqw', background: hole }} />)}
         </span>
       </span>
+    );
+  } else if (icon === 'import') {
+    glyph = (
+      <svg viewBox="0 0 24 24" shapeRendering="geometricPrecision" style={{ display: 'block', width: '46cqw', height: '46cqw', fill: ink }}>
+        <path d="M10.5 2h3v8.2h3.6L12 15.6 6.9 10.2h3.6z" />
+        <path d="M2.5 13.5h3v4.5h13v-4.5h3V21h-19z" />
+      </svg>
     );
   } else if (icon === 'play') {
     glyph = <span style={{ width: '36cqw', height: '42cqw', background: ink, clipPath: 'polygon(0 0,100% 50%,0 100%)', transform: 'translateX(8%)' }} />;
@@ -155,11 +163,12 @@ class Composer extends Component<object, State> {
     phase: 'practice', picks: [], cur: 0, playing: false, audioName: null, audioDur: 0,
     bpm: '', offset: '0', grid: '2', mode: 'keys', down: [0, 0, 0, 0], ctrlFlash: null,
     sels: [], stageH: 520, dragging: false, copied: false,
-    reaction: null, reactDraft: null, viewZoom: 1, box: null, outOpen: false,
+    reaction: null, reactDraft: null, editZ: null, box: null, outOpen: false, picker: null, wantAudio: null,
   };
 
   lanesRef = createRef<HTMLDivElement>();
   fileRef = createRef<HTMLInputElement>();
+  importRef = createRef<HTMLInputElement>();
   layerA = createRef<HTMLDivElement>();
   layerB = createRef<HTMLDivElement>();
   marqBox = createRef<HTMLButtonElement>();
@@ -173,7 +182,7 @@ class Composer extends Component<object, State> {
   lastLane = 1; insHeld = false; litKey = '';
   marqKey = ''; marqEl: HTMLSpanElement | null = null;
   audio!: HTMLAudioElement; ac: AudioContext | null = null; url: string | null = null;
-  raf = 0; audT = 0; cft = 0; cpt = 0;
+  raf = 0; audT = 0; cft = 0; cpt = 0; holdT = 0; playFrom: number | null = null; heard = new Set<number>(); ladder: number[] | null = null;
   ro: ResizeObserver | null = null; stageEl: HTMLDivElement | null = null;
   outFor: Note[] | null = null; outOff = 0; outStr = '';
 
@@ -208,6 +217,8 @@ class Composer extends Component<object, State> {
       if (this.state.phase === 'recording') this.stopRecording();
       else if (this.state.playing) this.t0 = performance.now() - this.liveCur;
     });
+    // Playback actually began: align the clock to the audio once, absorbing play() start latency.
+    this.audio.addEventListener('playing', () => { if (this.live()) this.t0 = performance.now() - (this.audio.currentTime * 1000 - this.off()); });
     this.audio.addEventListener('loadedmetadata', () => this.setState({ audioDur: this.audio.duration * 1000 }));
     window.addEventListener('keydown', this.kd); window.addEventListener('keyup', this.ku);
     this.attachStage();
@@ -239,9 +250,31 @@ class Composer extends Component<object, State> {
   // ── Geometry ──
   stageH() { return this.state.stageH > 100 ? this.state.stageH : 520; }
   reaction() { return this.state.reaction ?? REACTION; }
-  baseZ() { return LANE / (2 * this.reaction()); }
-  vz() { return this.state.phase === 'saving' && !this.state.playing ? this.state.viewZoom : 1; }
-  zoomV() { return this.baseZ() * this.vz(); }
+  // Recording scroll speed follows Reaction, capped at the 30 ms speed so frame-sized windows stay usable.
+  baseZ() { return LANE / (2 * Math.max(30, this.reaction())); }
+  // Edit/playtest zoom is absolute (px per ms) and independent of Reaction; only recording scrolls at the Reaction-based speed.
+  editZ() { return this.state.editZ ?? this.baseZ(); }
+  zoomV() { return this.state.phase === 'saving' ? this.editZ() : this.baseZ(); }
+  clampZ(z: number) { return Math.min(3, Math.max(0.01, z)); }
+  // Frame ladder for the Reaction +/− buttons: 1f@240, 1f@120, then whole frames at 60 FPS up to 2 s.
+  reactLadder() { return this.ladder || (this.ladder = [1000 / 240, 1000 / 120, ...Array.from({ length: 120 }, (_, i) => (i + 1) * 1000 / 60)]); }
+  stepReaction(dir: number) {
+    const r = this.reaction(), L = this.reactLadder(), eps = 1e-3;
+    const v = dir < 0 ? [...L].reverse().find(x => x < r - eps) : L.find(x => x > r + eps);
+    if (v != null) this.setReaction(v);
+  }
+  setReaction(v: number) {
+    // Freeze the edit zoom first so changing Reaction doesn't rescale the edit view.
+    this.setState({ reaction: Math.min(2000, Math.max(4, v)), reactDraft: null, editZ: this.state.editZ ?? this.editZ() });
+  }
+  frameLabel(r: number) {
+    const near = (a: number, b: number) => Math.abs(a - b) < 0.02;
+    if (near(r, 1000 / 240)) return '1-frame @ 240 FPS';
+    if (near(r, 1000 / 120)) return '1-frame @ 120 FPS';
+    const f = r * 60 / 1000, n = Math.max(1, Math.round(f));
+    return (near(f * 1000 / 60, n * 1000 / 60) ? '' : '≈') + n + '-frame @ 60 FPS';
+  }
+  msLabel(r: number) { return String(Math.round(r * 100) / 100); }
   barH() { return Math.max(120, this.stageH() - 76); }
   bridgeY() { return this.stageH() * BRIDGE; }
   geom() {
@@ -251,19 +284,18 @@ class Composer extends Component<object, State> {
     const T0 = Math.min(0, tLo), T1 = Math.max(last + 2000, this.hasAudio() ? s.audioDur || 0 : 0, tHi, T0 + 1000);
     return { H, by, z, cur, tLo, tHi, T0, T1, span: T1 - T0, bh: this.barH() };
   }
-  clampVZ(v: number) { return Math.min(8, Math.max(0.05, v)); }
   barDrag(e: React.PointerEvent, kind: 'thumb' | 'hi' | 'lo') {
     e.preventDefault(); e.stopPropagation();
-    const g = this.geom(), y0 = e.clientY, k = g.span / g.bh, b = this.baseZ();
+    const g = this.geom(), y0 = e.clientY, k = g.span / g.bh;
     this.drag(ev => {
       const dt = -(ev.clientY - y0) * k;
       if (kind === 'thumb') return this.setState({ cur: Math.max(-2000, g.cur + dt) });
       if (kind === 'hi') {
-        const vz = this.clampVZ(g.H / Math.max(100, g.tHi + dt - g.tLo) / b), z = b * vz;
-        return this.setState({ viewZoom: vz, cur: g.tLo + (g.H - g.by) / z });
+        const z = this.clampZ(g.H / Math.max(100, g.tHi + dt - g.tLo));
+        return this.setState({ editZ: z, cur: g.tLo + (g.H - g.by) / z });
       }
-      const vz = this.clampVZ(g.H / Math.max(100, g.tHi - (g.tLo + dt)) / b), z = b * vz;
-      this.setState({ viewZoom: vz, cur: g.tHi - g.by / z });
+      const z = this.clampZ(g.H / Math.max(100, g.tHi - (g.tLo + dt)));
+      this.setState({ editZ: z, cur: g.tHi - g.by / z });
     });
   }
   barClick(e: React.PointerEvent) {
@@ -271,8 +303,8 @@ class Composer extends Component<object, State> {
     const t = g.T0 + (1 - (e.clientY - r.top) / r.height) * g.span;
     this.setState({ cur: Math.max(-2000, t - (2 * g.by - g.H) / (2 * g.z)) });
   }
-  zoomView(f: number) { this.setState(s => ({ viewZoom: this.clampVZ(s.viewZoom * f) })); }
-  zoomBy(f: number) { this.setState({ reactDraft: null, reaction: Math.round(Math.min(2000, Math.max(30, this.reaction() / f))) }); }
+  zoomView(f: number) { this.setState({ editZ: this.clampZ(this.editZ() * f) }); }
+  zoomBy(f: number) { this.stepReaction(f > 1 ? -1 : 1); }
 
   // ── Transport ──
   hasAudio() { return this.state.mode === 'music' && !!this.state.audioName; }
@@ -316,6 +348,7 @@ class Composer extends Component<object, State> {
     this.drawStrings(dt);
     const { playing, picks } = this.state;
     let need = false;
+    if (this.insHeld && !playing) { this.insHeld = false; need = true; }
     const nb = this.bubblesArr.filter(b => now - b.born < 340);
     if (nb.length !== this.bubblesArr.length) { this.bubblesArr = nb; need = true; }
     const lit = this.auto.map(a => now - a < 140).join();
@@ -323,7 +356,7 @@ class Composer extends Component<object, State> {
     if (this.live()) {
       const c = this.clock();
       if (playing) {
-        for (const p of picks) if (p.t > this.lastCur && p.t <= c) { this.hit(p.lane, true); need = true; }
+        for (const p of picks) if (p.t > this.lastCur && p.t <= c && !this.heard.delete(p.id)) { this.hit(p.lane, true); need = true; }
       }
       this.lastCur = this.liveCur = c;
       const y = this.layerY(c) + 'px';
@@ -400,6 +433,8 @@ class Composer extends Component<object, State> {
     const down = this.state.down.slice(); down[lane - 1] = 1;
     if (phase === 'saving' && this.state.playing && this.insHeld) {
       const n = this.mk(lane, this.snapT(Math.max(0, this.clock())));
+      // Already sounded on the keypress; don't let playback trigger it again when the cursor passes it.
+      if (n.t > this.lastCur) this.heard.add(n.id);
       this.hit(lane, false);
       this.setState(s => ({ down, picks: [...s.picks, n].sort((a, b) => a.t - b.t) }));
       return;
@@ -427,10 +462,44 @@ class Composer extends Component<object, State> {
       else if (phase === 'standby' || phase === 'recording') { this.click(); this.stopRecording(); }
     } else if (k === 'S') {
       if (phase === 'saving') { this.click(); this.flashCtrl('S'); this.setState({ outOpen: true }); }
-    } else if (phase === 'saving') {
-      this.click(); this.flashCtrl('D');
-      if (this.state.sels.length) this.deleteSel(); else this.clearAll();
+    } else if (k === 'D') {
+      if (phase === 'saving') {
+        this.click(); this.flashCtrl('D');
+        if (this.state.sels.length) this.deleteSel(); else this.clearAll();
+      }
+    } else if (this.canImport()) {
+      this.click(); this.flashCtrl('I'); this.importRef.current?.click();
     }
+  }
+  canImport() { const p = this.state.phase; return p !== 'standby' && p !== 'recording' && !this.state.playing; }
+  // Reads back a track saved by download(): the C++ picks plus the Audio/Offset/BPM/Reaction header.
+  onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0]; e.target.value = '';
+    if (!f) return;
+    f.text().then(txt => {
+      const picks: Note[] = [], re = /KeyboardKey>\s*\(\s*(\d+)\s*\)\s*,\s*(-?\d+(?:\.\d+)?)\s*\}/g;
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(txt))) {
+        const lane = +m[1] - 48;
+        if (lane >= 1 && lane <= 4) picks.push(this.mk(lane, Math.max(0, Math.round(+m[2]))));
+      }
+      if (!picks.length) { console.warn('Import: no picks found in', f.name); return; }
+      const num = (rx: RegExp) => { const r = txt.match(rx); return r ? parseFloat(r[1]) : NaN; };
+      const off = num(/\*\*Offset:\*\*\s*(-?[\d.]+)/i), bpm = num(/\*\*BPM:\*\*\s*([\d.]+)/i), react = num(/\*\*Reaction:\*\*\s*([\d.]+)/i);
+      const patch: Partial<State> = { phase: 'saving', picks: picks.sort((a, b) => a.t - b.t), cur: 0, playing: false, sels: [], outOpen: false };
+      if (!isNaN(off)) patch.offset = String(off);
+      if (!isNaN(bpm)) patch.bpm = String(bpm);
+      if (!isNaN(react) && react > 0) { patch.reaction = Math.min(2000, Math.max(4, react)); patch.reactDraft = null; patch.editZ = null; }
+      const audio = txt.match(/\*\*Audio:\*\*\s*(.+?)\s*$/im)?.[1] ?? null;
+      if (audio) {
+        patch.mode = 'music';
+        if (this.state.audioName !== audio) {
+          patch.audioName = null; patch.audioDur = 0; patch.wantAudio = audio;
+          this.audio.removeAttribute('src'); this.audio.load();
+        } else patch.wantAudio = null;
+      }
+      this.stopAudio(); this.setState(patch as State);
+    });
   }
   playFromStart() {
     if (this.state.phase !== 'saving') return;
@@ -454,20 +523,27 @@ class Composer extends Component<object, State> {
     this.stopAudio();
     this.setState(s => ({ phase: 'saving', cur: 0, playing: false, picks: [...s.picks].sort((a, b) => a.t - b.t) }));
   }
-  clearAll() { this.stopAudio(); this.setState({ phase: 'practice', picks: [], cur: 0, playing: false, sels: [] }); }
+  clearAll() { this.stopAudio(); this.setState({ phase: 'practice', picks: [], cur: 0, playing: false, sels: [], editZ: null, picker: null }); }
   deleteSel() { this.setState(s => ({ picks: s.picks.filter(p => !s.sels.includes(p.id)), sels: [] })); }
   togglePlay() {
     if (this.state.phase !== 'saving') return;
     if (this.state.playing) { this.stopAudio(); this.setState({ playing: false, cur: this.liveCur }); return; }
     const cur = Math.max(0, this.state.cur);
+    this.playFrom = cur;
     this.startAudio(cur);
-    this.lastCur = cur - 0.001; this.liveCur = cur;
-    this.setState({ playing: true, cur });
+    this.lastCur = cur - 0.001; this.liveCur = cur; this.heard.clear();
+    this.setState({ playing: true, cur, picker: null });
+  }
+  // F12: resume from the bridge; pressed again, pause and jump back to where playback was resumed.
+  resumeToggle() {
+    if (this.state.phase !== 'saving') return;
+    if (this.state.playing) { this.stopAudio(); this.setState({ playing: false, cur: this.playFrom ?? this.liveCur }); return; }
+    this.togglePlay();
   }
 
   // ── Quantize ──
   stepMs() { const b = parseFloat(this.state.bpm); return b > 0 ? 60000 / b / parseInt(this.state.grid) : 0; }
-  off() { return this.state.mode === 'music' ? (parseFloat(this.state.offset) || 0) : 0; }
+  off() { return this.state.mode === 'music' ? (parseFloat(this.state.offset) || 0) * 1000 : 0; }
   snapT(t: number) {
     const st = this.stepMs();
     if (!st) return Math.max(0, Math.round(t));
@@ -497,7 +573,9 @@ class Composer extends Component<object, State> {
     const tag = ((e.target as HTMLElement).tagName || '').toLowerCase();
     if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
     const m = e.code.match(/^(?:Digit|Numpad)([1-4])$/);
+    if (m && this.state.picker) { e.preventDefault(); if (!e.repeat) this.pickLane(+m[1]); return; }
     if (m) { e.preventDefault(); if (!e.repeat) this.keyDown(+m[1]); return; }
+    if (e.code === 'F12') { e.preventDefault(); if (!e.repeat) this.resumeToggle(); return; }
     if ((e.metaKey || e.ctrlKey) && e.code === 'KeyA' && this.editable()) {
       e.preventDefault(); this.setState(s => ({ sels: s.picks.map(p => p.id) })); return;
     }
@@ -510,10 +588,14 @@ class Composer extends Component<object, State> {
       case 'Space': e.preventDefault(); this.togglePlay(); break;
       case 'Enter': case 'NumpadEnter': e.preventDefault(); this.playFromStart(); break;
       case 'Insert':
-        e.preventDefault(); this.insHeld = true;
-        if (!this.state.playing) this.spawnNote(); else this.forceUpdate();
+        e.preventDefault();
+        if (this.state.phase !== 'saving') this.ctrl('I'); else this.insertKey();
         break;
-      case 'Escape': if (this.state.outOpen) this.setState({ outOpen: false }); else this.setState({ sels: [] }); break;
+      case 'Escape':
+        if (this.state.outOpen) this.setState({ outOpen: false });
+        else if (this.state.picker) this.setState({ picker: null });
+        else this.setState({ sels: [] });
+        break;
       case 'ArrowUp': case 'ArrowDown': case 'ArrowLeft': case 'ArrowRight':
         if (this.state.sels.length && this.editable()) { e.preventDefault(); this.nudge(e.code); }
         break;
@@ -521,8 +603,12 @@ class Composer extends Component<object, State> {
       case 'Minus': this.zoomBy(0.8); break;
     }
   }
+  // INS in edit: paused → add a note at the bridge; playing → toggle live-insert mode (1–4 add notes) on/off.
+  insertKey() {
+    if (this.state.playing) { this.insHeld = !this.insHeld; this.forceUpdate(); }
+    else this.spawnNote();
+  }
   onKeyUp(e: KeyboardEvent) {
-    if (e.code === 'Insert') { this.insHeld = false; this.forceUpdate(); }
     const m = e.code.match(/^(?:Digit|Numpad)([1-4])$/);
     if (m) this.keyUp(+m[1]);
   }
@@ -568,12 +654,24 @@ class Composer extends Component<object, State> {
     const r = this.lanesRef.current!.getBoundingClientRect();
     return this.state.cur + (this.bridgeY() - (clientY - r.top)) / this.zoomV();
   }
+  pickLane(lane: number) {
+    const pk = this.state.picker; if (!pk) return;
+    const n = this.mk(lane, pk.t); this.lastLane = lane; this.hit(lane, false);
+    this.setState(s => ({ picker: null, picks: [...s.picks, n].sort((a, b) => a.t - b.t), sels: [n.id] }));
+  }
   onStageDown(e: React.PointerEvent) {
     if (!this.editable()) return;
+    if (this.state.picker) { this.setState({ picker: null }); return; }
     const r = this.lanesRef.current!.getBoundingClientRect(), x0 = e.clientX - r.left, ta = this.timeAt(e.clientY);
     const base = e.shiftKey ? this.state.sels : [];
     this.setState({ sels: base, box: null });
+    // Click-and-hold still on an empty spot opens a 1–4 picker; moving first starts a box-select instead.
+    let held = false; const cx0 = e.clientX, cy0 = e.clientY, py = e.clientY - r.top;
+    clearTimeout(this.holdT);
+    this.holdT = window.setTimeout(() => { held = true; this.setState({ box: null, sels: base, picker: { x: x0, y: py, t: this.snapT(Math.max(0, ta)) } }); }, 350);
     this.edgeDrag(ev => {
+      if (held) return;
+      if (Math.abs(ev.clientX - cx0) > 4 || Math.abs(ev.clientY - cy0) > 4) clearTimeout(this.holdT);
       const z = this.zoomV(), by = this.bridgeY(), cur = this.state.cur, H = r.height;
       const x1 = Math.max(0, Math.min(r.width, ev.clientX - r.left)), tb = this.timeAt(Math.max(r.top, Math.min(r.bottom, ev.clientY)));
       const ya = by + (cur - ta) * z, yb = by + (cur - tb) * z;
@@ -586,7 +684,7 @@ class Composer extends Component<object, State> {
         return cx + 29 >= box.x && cx - 29 <= box.x + box.w && p.t + pad >= tLo && p.t - pad <= tHi;
       }).map(p => p.id);
       this.setState({ box, sels: [...new Set([...base, ...hit])] });
-    }, () => this.setState({ box: null }));
+    }, () => { clearTimeout(this.holdT); this.setState({ box: null }); });
   }
   noteDown(e: React.PointerEvent, id: number) {
     e.stopPropagation();
@@ -634,6 +732,18 @@ class Composer extends Component<object, State> {
     const items = ps.map(p => `{static_cast<KeyboardKey>(${48 + p.lane}),${Math.round(p.t)}}`);
     return this.outStr = `inline const size_t trackSize = ${ps.length};\ninline Pick track[trackSize] = {\n    ${items.join(', ')}\n};`;
   }
+  download() {
+    const s = this.state, song = s.audioName ? s.audioName.replace(/\.[^.]+$/, '') : 'Untitled';
+    const offS = s.mode === 'music' ? (parseFloat(s.offset) || 0) : 0;
+    const bpm = parseFloat(s.bpm) > 0 ? String(parseFloat(s.bpm)) : '—', rx = this.msLabel(this.reaction()), rxF = this.frameLabel(this.reaction());
+    const audioLine = s.audioName ? `**Audio:** ${s.audioName}  \n` : '';
+    const md = `# ${song}\n\n${audioLine}**Offset:** ${offS} s  \n**BPM:** ${bpm}  \n**Reaction:** ${rx} ms (${rxF})\n\n\`\`\`cpp\n${this.output()}\n\`\`\`\n`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+    a.download = song.replace(/[\\/:*?"<>|]+/g, '_') + '.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
   copy() {
     const done = () => {
       this.setState({ copied: true }); clearTimeout(this.cpt);
@@ -652,12 +762,12 @@ class Composer extends Component<object, State> {
     if (this.url) URL.revokeObjectURL(this.url);
     this.url = URL.createObjectURL(f);
     this.stopAudio(); this.audio.src = this.url; this.audio.load();
-    this.setState({ audioName: f.name, audioDur: 0, playing: false });
+    this.setState({ audioName: f.name, audioDur: 0, playing: false, wantAudio: null });
     e.target.value = '';
   }
   commitReact() {
     const v = parseFloat(this.state.reactDraft ?? '');
-    this.setState({ reaction: v > 0 ? Math.round(Math.min(2000, Math.max(30, v))) : this.state.reaction, reactDraft: null });
+    if (v > 0) this.setReaction(v); else this.setState({ reactDraft: null });
   }
 
   fmt(ms: number) { ms = Math.max(0, Math.round(ms)); return Math.floor(ms / 1000) + '.' + Math.floor((ms % 1000) / 100) + 's'; }
@@ -691,16 +801,52 @@ class Composer extends Component<object, State> {
     const keyState = (l: number): KeyState =>
       s.down[l - 1] || now - this.auto[l - 1] < 140 ? 'pressed' : rec ? 'normal' : 'blocked';
     const cs = (k: Ctrl, b: KeyState): KeyState => (s.ctrlFlash === k ? 'pressed' : b);
-    const ctrlKeys: { k: Ctrl; icon: KeyIcon; caption: string; state: KeyState }[] = [
-      { k: 'R', icon: 'record', caption: 'R', state: cs('R', rec ? 'pressed' : sav ? 'blocked' : 'normal') },
-      { k: 'S', icon: 'save', caption: 'S', state: cs('S', sav ? 'normal' : 'blocked') },
-      { k: 'D', icon: 'trash', caption: 'DEL', state: cs('D', sav ? 'normal' : 'blocked') },
+    // Edit shows Save/Delete; everything else shows Record/Import.
+    const ctrlKeys: { k: Ctrl; icon: KeyIcon; caption: string; state: KeyState }[] = sav ? [
+      { k: 'S', icon: 'save', caption: 'S', state: cs('S', 'normal') },
+      { k: 'D', icon: 'trash', caption: 'DEL', state: cs('D', 'normal') },
+    ] : [
+      { k: 'R', icon: 'record', caption: 'R', state: cs('R', rec ? 'pressed' : 'normal') },
+      { k: 'I', icon: 'import', caption: 'INS', state: cs('I', this.canImport() ? 'normal' : 'blocked') },
     ];
     const editKeys: { icon: KeyIcon; label: string; caption: string; title: string; state: KeyState; run: () => void }[] = [
       { icon: 'restart', label: '', caption: 'ENTER', title: 'Play from the beginning', state: 'normal', run: () => this.playFromStart() },
-      { icon: s.playing ? 'pause' : 'play', label: '', caption: 'SPACE', title: 'Play / pause from here', state: 'normal', run: () => this.togglePlay() },
-      { icon: 'none', label: '+', caption: 'INS', title: 'Add a note at the bridge in the last-used lane', state: this.insHeld ? 'pressed' : 'normal', run: () => this.spawnNote() },
+      { icon: s.playing ? 'pause' : 'play', label: '', caption: 'F12', title: 'Resume from the bridge; again to pause and jump back', state: 'normal', run: () => this.resumeToggle() },
+      { icon: 'none', label: '+', caption: 'INS', title: 'Paused: add a note at the bridge. Playing: toggle live insert.', state: this.insHeld ? 'pressed' : 'normal', run: () => this.insertKey() },
     ];
+
+    // Reaction window around every note (playtest + edit): lit band ±Reaction, lanes dimmed outside it;
+    // when the window is taller than half the view, error-bar whiskers instead.
+    const reactEls: CSSProperties[] = [];
+    if (sav && s.picks.length) {
+      const R = this.reaction(), whisk = R * z > H * 0.5, lo = tMin - R, hi = tMax + R;
+      const bar: CSSProperties = { position: 'absolute', background: 'rgba(255,255,255,.4)', pointerEvents: 'none' };
+      for (let l = 1; l <= 4; l++) {
+        const ws = s.picks.filter(p => p.lane === l && p.t + R >= tMin && p.t - R <= tMax).map(p => [p.t - R, p.t + R]);
+        const x = (l - 1) * LANE;
+        if (!whisk) {
+          let at = lo; const gaps: number[][] = [];
+          for (const [a, b] of ws) { if (a > at) gaps.push([at, a]); at = Math.max(at, b); }
+          if (at < hi) gaps.push([at, hi]);
+          for (const [a, b] of gaps) reactEls.push({ position: 'absolute', left: x, width: LANE, top: Y(b), height: (b - a) * z, background: 'rgba(0,0,0,.55)', pointerEvents: 'none' });
+          for (const [a, b] of ws) {
+            // Top and bottom edges of the window, plus a pillar on each side of the lane.
+            for (const yy of [Y(b), Y(a)]) reactEls.push({ ...bar, left: x + 6, width: 74, top: yy - 0.5, height: 1 });
+            for (const px of [x + 6, x + 78]) reactEls.push({ ...bar, left: px, width: 2, top: Y(b), height: (b - a) * z });
+          }
+        } else {
+          for (const [a, b] of ws) {
+            const yc = Y(a + R), cx = x + LANE / 2, cap: CSSProperties = { ...bar, left: cx - 12, width: 24, height: 2, background: 'rgba(255,255,255,.6)' };
+            for (const dx of [-9, 9]) {
+              reactEls.push({ ...bar, left: cx - 1 + dx, width: 2, top: Y(b), height: Math.max(0, yc - 29 - Y(b)) });
+              reactEls.push({ ...bar, left: cx - 1 + dx, width: 2, top: yc + 29, height: Math.max(0, Y(a) - yc - 29) });
+            }
+            reactEls.push({ ...cap, top: Y(b) - 1 }, { ...cap, top: Y(a) - 1 });
+          }
+        }
+      }
+    }
+    const pk = s.picker && ed ? s.picker : null;
     const emptyBy: Partial<Record<Phase, string>> = {
       practice: isMusic && !this.hasAudio() ? 'Choose an audio file to record against.' : 'Press R to start recording',
       standby: 'Waiting for your first key…',
@@ -732,19 +878,20 @@ class Composer extends Component<object, State> {
               </div>
               {isMusic && (
                 <button onClick={() => this.fileRef.current?.click()} ref={this.marqBox} style={{ maxWidth: 220, padding: 0, border: 'none', background: 'none', color: '#fff', fontFamily: FONT, fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: 3 }}>
-                  <span ref={this.marqText} style={{ display: 'inline-block' }}>{s.audioName || 'Choose a file…'}</span>
+                  <span ref={this.marqText} style={{ display: 'inline-block' }}>{s.audioName || (s.wantAudio ? 'Load ' + s.wantAudio + '…' : 'Choose a file…')}</span>
                 </button>
               )}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
               <input type="file" accept="audio/*" ref={this.fileRef} onChange={e => this.onFile(e)} style={{ display: 'none' }} />
+              <input type="file" accept=".md,.markdown,.txt,text/markdown,text/plain" ref={this.importRef} onChange={e => this.onImport(e)} style={{ display: 'none' }} />
               <Field label="BPM">
                 <input type="number" min={1} placeholder="—" value={s.bpm} onChange={e => this.resnap({ bpm: e.target.value })} style={{ ...fieldInput, width: 48 }} />
               </Field>
               {isMusic && (
                 <Field label="OFFSET">
-                  <input type="number" value={s.offset} onChange={e => this.resnap({ offset: e.target.value })} style={{ ...fieldInput, width: 52 }} />
-                  <span style={{ fontSize: 11, color: '#fff' }}>ms</span>
+                  <input type="number" step={0.01} value={s.offset} onChange={e => this.resnap({ offset: e.target.value })} style={{ ...fieldInput, width: 52 }} />
+                  <span style={{ fontSize: 11, color: '#fff' }}>s</span>
                 </Field>
               )}
             </div>
@@ -757,14 +904,15 @@ class Composer extends Component<object, State> {
                 <span style={label}>Length</span><span style={value}>{lengthLabel}</span>
                 {isMusic && <><span style={label}>Audio</span><span style={value}>{s.audioDur ? this.clockFmt(s.audioDur) : '—'}</span></>}
               </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 18, fontSize: 13 }}>
                 <span style={label}>Reaction</span>
                 <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                   <StepButton onClick={() => this.zoomBy(1.25)} size={24}>+</StepButton>
                   <span style={{ display: 'flex', alignItems: 'baseline', gap: 3, minWidth: 64, justifyContent: 'center' }}>
                     <input
-                      className="lc-react" type="number" min={30} max={2000}
-                      value={s.reactDraft ?? String(this.reaction())}
+                      className="lc-react" type="number" min={4} max={2000} step="any"
+                      value={s.reactDraft ?? this.msLabel(this.reaction())}
                       onChange={e => this.setState({ reactDraft: e.target.value })}
                       onBlur={() => this.commitReact()}
                       onKeyDown={e => {
@@ -779,6 +927,8 @@ class Composer extends Component<object, State> {
                   </span>
                   <StepButton onClick={() => this.zoomBy(0.8)} size={24}>−</StepButton>
                 </span>
+              </div>
+              <span title="Reaction window in frames at 60 FPS" style={{ fontSize: 11, fontWeight: 600, color: '#9a9a9a', whiteSpace: 'nowrap' }}>{this.frameLabel(this.reaction())}</span>
               </div>
             </div>
 
@@ -801,6 +951,7 @@ class Composer extends Component<object, State> {
                 {ruler.map(r => (
                   <div key={r.label} style={{ position: 'absolute', left: -56, width: 46, top: r.y, transform: 'translateY(-50%)', textAlign: 'right', fontWeight: 600, fontSize: 11, color: '#fff' }}>{r.label}</div>
                 ))}
+                {reactEls.map((st, i) => <div key={i} style={st} />)}
               </div>
               <svg style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflow: 'visible', pointerEvents: 'none' }}>
                 {['0a', '0b', '1a', '1b', '2a', '2b', '3a', '3b'].map(k => (
@@ -822,6 +973,18 @@ class Composer extends Component<object, State> {
                   </div>
                 ))}
               </div>
+              {pk && (
+                <>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: pk.y, height: 1, background: 'rgba(255,255,255,.5)', pointerEvents: 'none' }} />
+                  <div onPointerDown={e => e.stopPropagation()} style={{ position: 'absolute', left: Math.max(4, Math.min(344 - 4 - 172, pk.x - LANE)), top: Math.max(4, Math.min(H - 48, pk.y - 52)), zIndex: 5, display: 'flex', gap: 4, padding: 4, background: '#fff', clipPath: oct(8) }}>
+                    {[1, 2, 3, 4].map(l => (
+                      <div key={l} onPointerDown={e => { e.preventDefault(); e.stopPropagation(); this.pickLane(l); }} style={{ width: 38, height: 38, cursor: 'pointer' }}>
+                        <Keycap label={String(l)} />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
               {s.box && (
                 <div style={{ position: 'absolute', left: s.box.x, top: s.box.y, width: s.box.w, height: s.box.h, boxShadow: 'inset 0 0 0 1px #fff', background: 'rgba(255,255,255,.07)', pointerEvents: 'none' }} />
               )}
@@ -900,7 +1063,10 @@ class Composer extends Component<object, State> {
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
                       <button onClick={() => this.setState({ outOpen: false })} style={{ padding: 2, border: 'none', background: '#fff', cursor: 'pointer', clipPath: oct(8) }}>
-                        <span className="lc-face" style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 16px', background: 'linear-gradient(#555,#111)', color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: 12, letterSpacing: '.06em', clipPath: oct(7) }}>CLOSE · ESC</span>
+                        <span className="lc-face" style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 16px', background: 'linear-gradient(#555,#111)', color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: 12, letterSpacing: '.06em', clipPath: oct(7) }}>ESC</span>
+                      </button>
+                      <button onClick={() => this.download()} style={{ padding: 2, border: 'none', background: '#fff', cursor: 'pointer', clipPath: oct(8) }}>
+                        <span className="lc-face" style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 16px', background: 'linear-gradient(#555,#111)', color: '#fff', fontFamily: FONT, fontWeight: 700, fontSize: 12, letterSpacing: '.06em', clipPath: oct(7) }}>SAVE</span>
                       </button>
                       <button onClick={() => this.copy()} style={{ padding: 2, border: 'none', background: '#fff', cursor: 'pointer', clipPath: oct(8) }}>
                         <span className="lc-face-light" style={{ display: 'flex', alignItems: 'center', height: 32, padding: '0 16px', background: 'linear-gradient(#fff,#c9c9c9)', color: '#000', fontFamily: FONT, fontWeight: 800, fontSize: 12, letterSpacing: '.06em', clipPath: oct(7) }}>{s.copied ? 'COPIED' : 'COPY'}</span>
