@@ -182,14 +182,14 @@ class Composer extends Component<object, State> {
   marqText = createRef<HTMLSpanElement>();
 
   nextId = 1; bubbleId = 1; bubblesArr: Bubble[] = [];
-  auto = [0, 0, 0, 0]; c0 = 0; p0 = 0; rate = 1; lastCur = 0; now = 0; liveCur = 0; lastRender = 0; lastFrame = 0;
+  auto = [0, 0, 0, 0]; c0 = 0; p0 = 0; a0 = 0; rate = 1; lastCur = 0; now = 0; liveCur = 0; lastRender = 0; lastFrame = 0;
   strs: Str[] = [0, 1, 2, 3].map(() => ({ off: 0, amp: 0, a: null, b: null, dirty: true }));
   strH = 0; strBy = 0;
   strRef: Record<string, (el: SVGPathElement | null) => void> = {};
   lastLane = 1; insHeld = false; litKey = '';
   marqKey = ''; marqEl: HTMLSpanElement | null = null;
-  audio!: HTMLAudioElement; ac: AudioContext | null = null; url: string | null = null;
-  raf = 0; audT = 0; cft = 0; cpt = 0; holdT = 0; playFrom: number | null = null; heard = new Set<number>(); ladder: number[] | null = null;
+  ac: AudioContext | null = null; buf: AudioBuffer | null = null; src: AudioBufferSourceNode | null = null; decodeId = 0;
+  raf = 0; cft = 0; cpt = 0; holdT = 0; playFrom: number | null = null; heard = new Set<number>(); ladder: number[] | null = null;
   ro: ResizeObserver | null = null; stageEl: HTMLDivElement | null = null;
   outFor: Note[] | null = null; outOff = 0; outStr = '';
 
@@ -219,15 +219,6 @@ class Composer extends Component<object, State> {
   }
 
   componentDidMount() {
-    this.audio = new Audio();
-    this.audio.preservesPitch = false;  // speed changes shift pitch, like a tape
-    this.audio.addEventListener('ended', () => {
-      if (this.state.phase === 'recording') this.stopRecording();
-      else if (this.state.playing) this.anchor(this.liveCur);
-    });
-    // Playback actually began: align the clock to the audio once, absorbing play() start latency.
-    this.audio.addEventListener('playing', () => { if (this.live()) this.anchor(this.audio.currentTime * 1000 - this.off()); });
-    this.audio.addEventListener('loadedmetadata', () => this.setState({ audioDur: this.audio.duration * 1000 }));
     window.addEventListener('keydown', this.kd); window.addEventListener('keyup', this.ku);
     this.attachStage();
     const loop = () => { this.tick(); this.raf = requestAnimationFrame(loop); };
@@ -241,7 +232,7 @@ class Composer extends Component<object, State> {
     if (this.stageEl) this.stageEl.removeEventListener('wheel', this.wh);
     this.stageEl = null;
     this.stopAudio();
-    if (this.url) URL.revokeObjectURL(this.url);
+    this.ac?.close(); this.ac = null;
   }
   attachStage() {
     const el = this.lanesRef.current;
@@ -317,42 +308,58 @@ class Composer extends Component<object, State> {
   zoomBy(f: number) { this.stepReaction(f > 1 ? -1 : 1); }
 
   // ── Transport ──
-  hasAudio() { return this.state.mode === 'music' && !!this.state.audioName; }
+  hasAudio() { return this.state.mode === 'music' && !!this.state.audioName && !!this.buf; }
   setMode(m: Mode) {
     const p = this.state.phase;
     if (p === 'standby' || p === 'recording' || this.state.playing) return;
     if (m === 'music' && (this.state.mode === 'music' || !this.state.audioName)) this.fileRef.current?.click();
     this.resnap({ mode: m });
   }
-  // audio.currentTime only advances in coarse steps, so reading it directly makes
-  // the lanes stutter. Run on the performance clock and steer it toward the audio:
-  // ease out small drift, snap on real jumps (seeks, buffering stalls).
-  // Timeline time runs at `rate` × real time from the anchor.
+  // Music plays through Web Audio and the timeline reads the same hardware clock the sound comes from,
+  // so the two can't drift apart. Without music the timeline runs on the performance clock.
+  // Either way it advances at `rate` × real time from its anchor: c0 at a0 (audio) or p0 (performance).
   clock() {
-    const now = performance.now();
-    if (this.hasAudio() && !this.audio.paused && this.audio.currentTime > 0) {
-      const drift = this.c0 + (now - this.p0) * this.rate - (this.audio.currentTime * 1000 - this.off());
-      if (Math.abs(drift) > 120) this.c0 -= drift;
-      else this.c0 -= drift * 0.05;
-    }
-    return this.c0 + (now - this.p0) * this.rate;
+    if (this.src) return this.c0 + Math.max(0, this.audioNow() - this.a0) * 1000 * this.rate;
+    return this.c0 + (performance.now() - this.p0) * this.rate;
+  }
+  // Context time of the sample currently reaching the speakers.
+  audioNow() {
+    const ac = this.ac!, ts = ac.getOutputTimestamp?.();
+    if (ts?.contextTime && ts.performanceTime) return ts.contextTime + (performance.now() - ts.performanceTime) / 1000;
+    return ac.currentTime - (ac.outputLatency || ac.baseLatency || 0);
   }
   anchor(cur: number) { this.c0 = cur; this.p0 = performance.now(); }
   setSpeed(v: number) {
     v = Math.round(Math.min(2, Math.max(0.2, v)) * 100) / 100;
-    if (this.live()) this.anchor(this.clock());
-    this.rate = v; this.audio.playbackRate = v;
+    if (this.src) {
+      // Re-anchor at the moment the new rate takes effect; pitch follows the rate, like a tape.
+      const t = this.ac!.currentTime;
+      if (t > this.a0) { this.c0 += (t - this.a0) * 1000 * this.rate; this.a0 = t; }
+      this.src.playbackRate.setValueAtTime(v, t);
+    } else if (this.live()) this.anchor(this.clock());
+    this.rate = v;
     this.setState({ speed: v });
   }
   startAudio(cur: number) {
-    clearTimeout(this.audT); this.audio.pause(); this.anchor(cur);
+    this.stopAudio(); this.anchor(cur);
     if (!this.hasAudio()) return;
-    const at = cur + this.off();
-    this.audio.playbackRate = this.rate;
-    if (at >= 0) { this.audio.currentTime = at / 1000; this.audio.play(); }
-    else { this.audio.currentTime = 0; this.audT = window.setTimeout(() => this.audio.play(), -at / this.rate); }
+    const ac = this.ctx(), at = (cur + this.off()) / 1000, t = ac.currentTime + 0.03;
+    const src = ac.createBufferSource();
+    src.buffer = this.buf; src.playbackRate.value = this.rate; src.connect(ac.destination);
+    src.onended = () => {
+      if (this.src !== src) return;
+      // Track ran out: keep the timeline going on the performance clock.
+      const c = this.clock(); this.src = null; this.anchor(c);
+      if (this.state.phase === 'recording') this.stopRecording();
+    };
+    // A negative position (offset skips past 0:00) delays the start instead of seeking.
+    src.start(t + Math.max(0, -at) / this.rate, Math.max(0, at));
+    this.src = src; this.c0 = cur; this.a0 = t;
   }
-  stopAudio() { clearTimeout(this.audT); this.audio?.pause(); }
+  stopAudio() {
+    const src = this.src; this.src = null;
+    if (src) { src.onended = null; src.stop(); }
+  }
   editable() { return this.state.phase === 'saving' && !this.state.playing; }
   live() { return this.state.phase === 'recording' || (this.state.phase === 'saving' && this.state.playing); }
   layerY(cur: number) {
@@ -514,7 +521,7 @@ class Composer extends Component<object, State> {
         patch.mode = 'music';
         if (this.state.audioName !== audio) {
           patch.audioName = null; patch.audioDur = 0; patch.wantAudio = audio;
-          this.audio.removeAttribute('src'); this.audio.load();
+          this.decodeId++; this.buf = null;
         } else patch.wantAudio = null;
       }
       this.stopAudio(); this.setState(patch as State);
@@ -779,12 +786,18 @@ class Composer extends Component<object, State> {
     navigator.clipboard.writeText(this.output()).then(done, fallback);
   }
   onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0]; if (!f) return;
-    if (this.url) URL.revokeObjectURL(this.url);
-    this.url = URL.createObjectURL(f);
-    this.stopAudio(); this.audio.src = this.url; this.audio.load();
+    const f = e.target.files?.[0]; e.target.value = '';
+    if (!f) return;
+    const ac = this.ctx(), id = ++this.decodeId;
+    this.stopAudio(); this.buf = null;
     this.setState({ audioName: f.name, audioDur: 0, playing: false, wantAudio: null });
-    e.target.value = '';
+    f.arrayBuffer().then(b => ac.decodeAudioData(b)).then(buf => {
+      if (id !== this.decodeId) return;
+      this.buf = buf; this.setState({ audioDur: buf.duration * 1000 });
+    }, err => {
+      if (id !== this.decodeId) return;
+      console.warn('Could not decode', f.name, err); this.setState({ audioName: null });
+    });
   }
   commitReact() {
     const v = parseFloat(this.state.reactDraft ?? '');
